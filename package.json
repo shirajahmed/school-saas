@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "A comprehensive multi-tenant, AI-powered School Management System built with modern technologies.",
   "private": true,
+  "authors": [
+    "Shiraj Ahmed <shirajahmed.com>"
+  ],
   "scripts": {
     "dev": "turbo run dev",
     "dev:web": "turbo run dev --filter=web",
