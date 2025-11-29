@@ -7,6 +7,51 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model School {
+  id        String   @id @default(uuid())
+  name      String
+  code      String   @unique
+  address   String?
+  phone     String?
+  email     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  branches  Branch[]
+  users     User[]
+  students  Student[]
+  teachers  Teacher[]
+  classes   Class[]
+  exams     Exam[]
+
+  @@map("schools")
+}
+
+model Branch {
+  id       String  @id @default(uuid())
+  schoolId String
+  name     String
+  code     String
+  address  String?
+  phone    String?
+  email    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  school    School     @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  users     User[]
+  students  Student[]
+  teachers  Teacher[]
+  classes   Class[]
+  sections  Section[]
+  attendance Attendance[]
+  exams     Exam[]
+  results   Result[]
+
+  @@unique([schoolId, code])
+  @@map("branches")
+}
+
 enum UserRole {
   SUPER_ADMIN
   SCHOOL_ADMIN
@@ -16,52 +61,186 @@ enum UserRole {
   PARENT
 }
 
-model School {
-  id        String   @id @default(cuid())
-  name      String
-  email     String   @unique
-  phone     String?
-  address   String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  branches Branch[]
-  users    User[]
-
-  @@map("schools")
-}
-
-model Branch {
-  id        String   @id @default(cuid())
-  name      String
-  address   String?
-  phone     String?
-  schoolId  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  users  User[]
-
-  @@map("branches")
-}
-
 model User {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid())
+  schoolId  String
+  branchId  String?
   email     String   @unique
   password  String
   firstName String
   lastName  String
   phone     String?
-  role      UserRole
-  schoolId  String
-  branchId  String?
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  school School  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  branch Branch? @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  school   School  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  branch   Branch? @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  roles    UserRole[]
+  student  Student?
+  teacher  Teacher?
 
   @@map("users")
+}
+
+model Student {
+  id           String   @id @default(uuid())
+  schoolId     String
+  branchId     String
+  userId       String   @unique
+  rollNumber   String
+  admissionNo  String
+  dateOfBirth  DateTime?
+  gender       String?
+  address      String?
+  parentPhone  String?
+  parentEmail  String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  school     School       @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  branch     Branch       @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  class      Class?       @relation(fields: [classId], references: [id])
+  classId    String?
+  section    Section?     @relation(fields: [sectionId], references: [id])
+  sectionId  String?
+  attendance Attendance[]
+  results    Result[]
+
+  @@unique([schoolId, rollNumber])
+  @@unique([schoolId, admissionNo])
+  @@map("students")
+}
+
+model Teacher {
+  id          String   @id @default(uuid())
+  schoolId    String
+  branchId    String
+  userId      String   @unique
+  employeeId  String
+  subject     String?
+  qualification String?
+  experience  Int?
+  salary      Decimal?
+  joinDate    DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  school   School    @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  branch   Branch    @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  classes  Class[]
+  sections Section[]
+  exams    Exam[]
+
+  @@unique([schoolId, employeeId])
+  @@map("teachers")
+}
+
+model Class {
+  id        String   @id @default(uuid())
+  schoolId  String
+  branchId  String
+  name      String
+  grade     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  school    School    @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  branch    Branch    @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  teacher   Teacher?  @relation(fields: [teacherId], references: [id])
+  teacherId String?
+  students  Student[]
+  sections  Section[]
+  exams     Exam[]
+
+  @@unique([schoolId, branchId, name])
+  @@map("classes")
+}
+
+model Section {
+  id        String   @id @default(uuid())
+  schoolId  String
+  branchId  String
+  classId   String
+  name      String
+  capacity  Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  branch     Branch       @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  class      Class        @relation(fields: [classId], references: [id], onDelete: Cascade)
+  teacher    Teacher?     @relation(fields: [teacherId], references: [id])
+  teacherId  String?
+  students   Student[]
+  attendance Attendance[]
+
+  @@unique([schoolId, branchId, classId, name])
+  @@map("sections")
+}
+
+model Attendance {
+  id        String   @id @default(uuid())
+  schoolId  String
+  branchId  String
+  studentId String
+  sectionId String
+  date      DateTime
+  status    String   // PRESENT, ABSENT, LATE
+  remarks   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  branch  Branch  @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  section Section @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+
+  @@unique([schoolId, studentId, date])
+  @@map("attendance")
+}
+
+model Exam {
+  id          String   @id @default(uuid())
+  schoolId    String
+  branchId    String
+  classId     String
+  name        String
+  type        String   // UNIT_TEST, MIDTERM, FINAL
+  subject     String
+  totalMarks  Int
+  passingMarks Int
+  examDate    DateTime
+  duration    Int      // in minutes
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  school   School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  branch   Branch   @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  class    Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
+  teacher  Teacher? @relation(fields: [teacherId], references: [id])
+  teacherId String?
+  results  Result[]
+
+  @@map("exams")
+}
+
+model Result {
+  id           String   @id @default(uuid())
+  schoolId     String
+  branchId     String
+  examId       String
+  studentId    String
+  marksObtained Int
+  grade        String?
+  remarks      String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  branch  Branch  @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  exam    Exam    @relation(fields: [examId], references: [id], onDelete: Cascade)
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([schoolId, examId, studentId])
+  @@map("results")
 }
