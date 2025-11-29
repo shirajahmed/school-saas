@@ -17,7 +17,7 @@ export class UsersController {
   @Roles(UserRole.SUPER_ADMIN, UserRole.SCHOOL_ADMIN, UserRole.BRANCH_ADMIN)
   async findAll() {
     return this.prisma.user.findMany({
-      select: { id: true, email: true, firstName: true, lastName: true, roles: true, isActive: true },
+      select: { id: true, email: true, firstName: true, lastName: true, role: true, status: true },
     });
   }
 
@@ -26,7 +26,7 @@ export class UsersController {
   async findOne(@Param('id') id: string) {
     return this.prisma.user.findUnique({
       where: { id },
-      select: { id: true, email: true, firstName: true, lastName: true, roles: true, isActive: true },
+      select: { id: true, email: true, firstName: true, lastName: true, role: true, status: true },
     });
   }
 
@@ -36,7 +36,7 @@ export class UsersController {
     const hashedPassword = await hash(dto.password, 10);
     return this.prisma.user.create({
       data: { ...dto, password: hashedPassword } as any,
-      select: { id: true, email: true, firstName: true, lastName: true, roles: true },
+      select: { id: true, email: true, firstName: true, lastName: true, role: true },
     });
   }
 
@@ -46,7 +46,7 @@ export class UsersController {
     return this.prisma.user.update({
       where: { id },
       data: dto,
-      select: { id: true, email: true, firstName: true, lastName: true, isActive: true },
+      select: { id: true, email: true, firstName: true, lastName: true, status: true },
     });
   }
 
