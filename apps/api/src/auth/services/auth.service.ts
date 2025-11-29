@@ -3,7 +3,8 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { PrismaService } from '../../common/database/prisma.service';
-import { SchoolSignupDto, LoginDto, CreateUserDto, SetupAccountDto } from '../dto/auth.dto';
+import { EmailService } from './email.service';
+import { SchoolSignupDto, LoginDto, CreateUserDto, SetupAccountDto, ForgotPasswordDto, ResetPasswordDto } from '../dto/auth.dto';
 import { UserRole, UserStatus } from '@prisma/client';
 
 @Injectable()
@@ -11,6 +12,7 @@ export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
+    private emailService: EmailService,
   ) {}
 
   // 1. School Signup (Public) - Creates school + admin
@@ -25,6 +27,10 @@ export class AuthService {
 
     const hashedPassword = await bcrypt.hash(dto.password, 12);
 
+    // Generate onboarding token
+    const onboardingToken = crypto.randomBytes(32).toString('hex');
+    const tokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
     const result = await this.prisma.$transaction(async (tx) => {
       // Create school
       const school = await tx.school.create({
@@ -33,6 +39,7 @@ export class AuthService {
           email: dto.email,
           phone: dto.phone,
           address: dto.address,
+          onboarded: false, // Not onboarded yet
         }
       });
 
@@ -45,7 +52,7 @@ export class AuthService {
         }
       });
 
-      // Create school admin
+      // Create school admin (PENDING until onboarding)
       const user = await tx.user.create({
         data: {
           schoolId: school.id,
@@ -56,19 +63,31 @@ export class AuthService {
           firstName: dto.firstName,
           lastName: dto.lastName,
           role: UserRole.SCHOOL_ADMIN,
-          status: UserStatus.PENDING, // Needs onboarding
+          status: UserStatus.PENDING, // Requires onboarding
         }
       });
 
-      return { school, user, branch };
+      // Create onboarding token
+      await tx.userToken.create({
+        data: {
+          userId: user.id,
+          token: onboardingToken,
+          type: 'SETUP',
+          expiresAt: tokenExpiry,
+        }
+      });
+
+      return { school, user, branch, onboardingToken };
     });
 
-    // TODO: Send onboarding email/SMS
+    // Send onboarding email with token
+    await this.emailService.sendOnboardingEmail(dto.email, dto.schoolName, onboardingToken);
 
     return {
-      message: 'School registered successfully. Check email for onboarding steps.',
+      message: 'School registered successfully. Check email to complete onboarding.',
       schoolId: result.school.id,
-      userId: result.user.id
+      userId: result.user.id,
+      onboardingToken: result.onboardingToken // For testing, remove in production
     };
   }
 
@@ -97,11 +116,6 @@ export class AuthService {
 
     if (!user.school.isActive) {
       throw new ForbiddenException('School account is suspended');
-    }
-
-    // Check onboarding for school admin
-    if (user.role === UserRole.SCHOOL_ADMIN && !user.school.onboarded) {
-      throw new ForbiddenException('Complete school onboarding first');
     }
 
     // Update last login
@@ -172,16 +186,64 @@ export class AuthService {
       return user;
     });
 
-    // TODO: Send setup email/SMS with token
+    // Send setup email
+    await this.emailService.sendSetupEmail(dto.email, setupToken);
 
     return {
-      message: 'User created successfully. Setup instructions sent.',
-      userId: result.id,
-      setupToken // Remove in production, send via email/SMS
+      message: 'User created successfully. Setup instructions sent via email.',
+      userId: result.id
     };
   }
 
-  // 4. Setup Account (Complete profile)
+  // 4. Complete Onboarding (School Admin)
+  async completeOnboarding(dto: SetupAccountDto) {
+    const tokenRecord = await this.prisma.userToken.findUnique({
+      where: { token: dto.token },
+      include: { 
+        user: {
+          include: { school: true }
+        }
+      }
+    });
+
+    if (!tokenRecord || tokenRecord.isUsed || tokenRecord.expiresAt < new Date()) {
+      throw new BadRequestException('Invalid or expired onboarding token');
+    }
+
+    if (tokenRecord.user.role !== UserRole.SCHOOL_ADMIN) {
+      throw new BadRequestException('This token is not for school onboarding');
+    }
+
+    await this.prisma.$transaction(async (tx) => {
+      // Activate user
+      await tx.user.update({
+        where: { id: tokenRecord.userId },
+        data: {
+          status: UserStatus.ACTIVE,
+          phone: dto.phone || tokenRecord.user.phone,
+        }
+      });
+
+      // Mark school as onboarded
+      await tx.school.update({
+        where: { id: tokenRecord.user.schoolId },
+        data: { onboarded: true }
+      });
+
+      // Mark token as used
+      await tx.userToken.update({
+        where: { id: tokenRecord.id },
+        data: { isUsed: true }
+      });
+    });
+
+    return { 
+      message: 'Onboarding completed successfully. You can now login to your dashboard.',
+      schoolName: tokenRecord.user.school.name
+    };
+  }
+
+  // 5. Setup Account (Complete profile for regular users)
   async setupAccount(dto: SetupAccountDto) {
     const tokenRecord = await this.prisma.userToken.findUnique({
       where: { token: dto.token },
@@ -215,7 +277,81 @@ export class AuthService {
     return { message: 'Account setup completed successfully' };
   }
 
-  // 5. Refresh Token
+  // 5. Forgot Password
+  async forgotPassword(dto: ForgotPasswordDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { email: dto.email, status: UserStatus.ACTIVE }
+    });
+
+    if (!user) {
+      // Don't reveal if email exists
+      return { message: 'If email exists, OTP has been sent' };
+    }
+
+    // Generate 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+    // Save OTP
+    await this.prisma.otp.create({
+      data: {
+        userId: user.id,
+        code: otp,
+        type: 'PASSWORD_RESET',
+        expiresAt
+      }
+    });
+
+    // Send OTP via email
+    await this.emailService.sendOtp(dto.email, otp);
+
+    return { message: 'If email exists, OTP has been sent' };
+  }
+
+  // 6. Reset Password
+  async resetPassword(dto: ResetPasswordDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { email: dto.email, status: UserStatus.ACTIVE }
+    });
+
+    if (!user) {
+      throw new BadRequestException('Invalid email');
+    }
+
+    // Verify OTP
+    const validOtp = await this.prisma.otp.findFirst({
+      where: {
+        userId: user.id,
+        code: dto.otp,
+        type: 'PASSWORD_RESET',
+        isUsed: false,
+        expiresAt: { gt: new Date() }
+      }
+    });
+
+    if (!validOtp) {
+      throw new BadRequestException('Invalid or expired OTP');
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(dto.newPassword, 12);
+
+    // Update password and mark OTP as used
+    await this.prisma.$transaction([
+      this.prisma.user.update({
+        where: { id: user.id },
+        data: { password: hashedPassword }
+      }),
+      this.prisma.otp.update({
+        where: { id: validOtp.id },
+        data: { isUsed: true }
+      })
+    ]);
+
+    return { message: 'Password reset successful' };
+  }
+
+  // 7. Refresh Token
   async refreshToken(refreshToken: string) {
     try {
       const payload = this.jwtService.verify(refreshToken);

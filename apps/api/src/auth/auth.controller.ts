@@ -1,6 +1,6 @@
 import { Controller, Post, Body, HttpCode, HttpStatus, UseGuards, Request } from '@nestjs/common';
 import { AuthService } from './services/auth.service';
-import { SchoolSignupDto, LoginDto, CreateUserDto, SetupAccountDto, RefreshTokenDto } from './dto/auth.dto';
+import { SchoolSignupDto, LoginDto, CreateUserDto, SetupAccountDto, RefreshTokenDto, ForgotPasswordDto, ResetPasswordDto } from './dto/auth.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Controller('auth')
@@ -29,14 +29,35 @@ export class AuthController {
     return this.authService.createUser(dto, req.user.sub);
   }
 
-  // 4. User Account Setup (Public with token)
+  // 4. Complete Onboarding (School Admin)
+  @Post('complete-onboarding')
+  @HttpCode(HttpStatus.OK)
+  async completeOnboarding(@Body() dto: SetupAccountDto) {
+    return this.authService.completeOnboarding(dto);
+  }
+
+  // 5. User Account Setup (Public with token)
   @Post('setup-account')
   @HttpCode(HttpStatus.OK)
   async setupAccount(@Body() dto: SetupAccountDto) {
     return this.authService.setupAccount(dto);
   }
 
-  // 5. Refresh Token
+  // 5. Forgot Password (Public)
+  @Post('forgot-password')
+  @HttpCode(HttpStatus.OK)
+  async forgotPassword(@Body() dto: ForgotPasswordDto) {
+    return this.authService.forgotPassword(dto);
+  }
+
+  // 6. Reset Password (Public)
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  async resetPassword(@Body() dto: ResetPasswordDto) {
+    return this.authService.resetPassword(dto);
+  }
+
+  // 7. Refresh Token
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   async refresh(@Body() dto: RefreshTokenDto) {
