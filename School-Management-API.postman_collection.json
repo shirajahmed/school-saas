@@ -918,6 +918,1718 @@
       ]
     },
     {
+      "name": "Student Management",
+      "item": [
+        {
+          "name": "Get All Students",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/students",
+              "host": ["{{baseUrl}}"],
+              "path": ["students"]
+            }
+          }
+        },
+        {
+          "name": "Search Students",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/students?search=john&branchId=branch-123&classId=class-456",
+              "host": ["{{baseUrl}}"],
+              "path": ["students"],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "john"
+                },
+                {
+                  "key": "branchId",
+                  "value": "branch-123"
+                },
+                {
+                  "key": "classId",
+                  "value": "class-456"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Student by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/students/student-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["students", "student-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Create Student",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Student\",\n  \"email\": \"john.student@school.com\",\n  \"phone\": \"+1234567890\",\n  \"branchId\": \"branch-123\",\n  \"rollNumber\": \"2024001\",\n  \"admissionNo\": \"ADM001\",\n  \"dateOfBirth\": \"2010-05-15\",\n  \"gender\": \"Male\",\n  \"address\": \"123 Student Street\",\n  \"parentPhone\": \"+1987654321\",\n  \"parentEmail\": \"parent@email.com\",\n  \"classId\": \"class-456\",\n  \"sectionId\": \"section-789\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/students",
+              "host": ["{{baseUrl}}"],
+              "path": ["students"]
+            }
+          }
+        },
+        {
+          "name": "Update Student",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"John Updated\",\n  \"lastName\": \"Student\",\n  \"email\": \"john.updated@school.com\",\n  \"phone\": \"+1234567890\",\n  \"rollNumber\": \"2024001\",\n  \"classId\": \"new-class-id\",\n  \"address\": \"456 New Address\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/students/student-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["students", "student-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Delete Student",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/students/student-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["students", "student-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Get Student Attendance",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/students/student-id-here/attendance?startDate=2024-01-01&endDate=2024-12-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["students", "student-id-here", "attendance"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-12-31"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Student Results",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/students/student-id-here/results",
+              "host": ["{{baseUrl}}"],
+              "path": ["students", "student-id-here", "results"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Teacher Management",
+      "item": [
+        {
+          "name": "Get All Teachers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teachers",
+              "host": ["{{baseUrl}}"],
+              "path": ["teachers"]
+            }
+          }
+        },
+        {
+          "name": "Search Teachers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teachers?search=math&subject=Mathematics&departmentId=dept-123",
+              "host": ["{{baseUrl}}"],
+              "path": ["teachers"],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "math"
+                },
+                {
+                  "key": "subject",
+                  "value": "Mathematics"
+                },
+                {
+                  "key": "departmentId",
+                  "value": "dept-123"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Teacher by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teachers/teacher-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["teachers", "teacher-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Create Teacher",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Teacher\",\n  \"email\": \"jane.teacher@school.com\",\n  \"phone\": \"+1234567890\",\n  \"branchId\": \"branch-123\",\n  \"departmentId\": \"dept-456\",\n  \"employeeId\": \"EMP001\",\n  \"subject\": \"Mathematics\",\n  \"qualification\": \"M.Sc Mathematics\",\n  \"experience\": 5,\n  \"salary\": 50000,\n  \"joinDate\": \"2024-01-15\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/teachers",
+              "host": ["{{baseUrl}}"],
+              "path": ["teachers"]
+            }
+          }
+        },
+        {
+          "name": "Update Teacher",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Jane Updated\",\n  \"subject\": \"Advanced Mathematics\",\n  \"qualification\": \"Ph.D Mathematics\",\n  \"experience\": 7,\n  \"salary\": 60000\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/teachers/teacher-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["teachers", "teacher-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Delete Teacher",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teachers/teacher-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["teachers", "teacher-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Get Teacher Classes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teachers/teacher-id-here/classes",
+              "host": ["{{baseUrl}}"],
+              "path": ["teachers", "teacher-id-here", "classes"]
+            }
+          }
+        },
+        {
+          "name": "Assign Teacher to Class",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"classId\": \"class-123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/teachers/teacher-id-here/assign-class",
+              "host": ["{{baseUrl}}"],
+              "path": ["teachers", "teacher-id-here", "assign-class"]
+            }
+          }
+        },
+        {
+          "name": "Get Teacher Schedule",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teachers/teacher-id-here/schedule",
+              "host": ["{{baseUrl}}"],
+              "path": ["teachers", "teacher-id-here", "schedule"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Class Management",
+      "item": [
+        {
+          "name": "Get All Classes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/classes",
+              "host": ["{{baseUrl}}"],
+              "path": ["classes"]
+            }
+          }
+        },
+        {
+          "name": "Search Classes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/classes?grade=10&branchId=branch-123&departmentId=dept-456",
+              "host": ["{{baseUrl}}"],
+              "path": ["classes"],
+              "query": [
+                {
+                  "key": "grade",
+                  "value": "10"
+                },
+                {
+                  "key": "branchId",
+                  "value": "branch-123"
+                },
+                {
+                  "key": "departmentId",
+                  "value": "dept-456"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Class by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/classes/class-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["classes", "class-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Create Class",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Grade 10 A\",\n  \"grade\": 10,\n  \"branchId\": \"branch-123\",\n  \"departmentId\": \"dept-456\",\n  \"teacherId\": \"teacher-789\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/classes",
+              "host": ["{{baseUrl}}"],
+              "path": ["classes"]
+            }
+          }
+        },
+        {
+          "name": "Update Class",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Grade 10 A Updated\",\n  \"teacherId\": \"new-teacher-id\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/classes/class-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["classes", "class-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Delete Class",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/classes/class-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["classes", "class-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Get Class Students",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/classes/class-id-here/students",
+              "host": ["{{baseUrl}}"],
+              "path": ["classes", "class-id-here", "students"]
+            }
+          }
+        },
+        {
+          "name": "Add Student to Class",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentId\": \"student-123\",\n  \"sectionId\": \"section-456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/classes/class-id-here/add-student",
+              "host": ["{{baseUrl}}"],
+              "path": ["classes", "class-id-here", "add-student"]
+            }
+          }
+        },
+        {
+          "name": "Remove Student from Class",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/classes/class-id-here/remove-student/student-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["classes", "class-id-here", "remove-student", "student-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Get Class Attendance Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/classes/class-id-here/attendance-summary?startDate=2024-01-01&endDate=2024-12-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["classes", "class-id-here", "attendance-summary"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-12-31"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Section for Class",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Section A\",\n  \"capacity\": 30,\n  \"teacherId\": \"teacher-123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/classes/class-id-here/sections",
+              "host": ["{{baseUrl}}"],
+              "path": ["classes", "class-id-here", "sections"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Department Management (Colleges)",
+      "item": [
+        {
+          "name": "Get All Departments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/departments",
+              "host": ["{{baseUrl}}"],
+              "path": ["departments"]
+            }
+          }
+        },
+        {
+          "name": "Search Departments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/departments?search=computer&branchId=branch-123",
+              "host": ["{{baseUrl}}"],
+              "path": ["departments"],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "computer"
+                },
+                {
+                  "key": "branchId",
+                  "value": "branch-123"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Department by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/departments/dept-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["departments", "dept-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Create Department (Enterprise+ Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Computer Science\",\n  \"code\": \"CS\",\n  \"branchId\": \"branch-123\",\n  \"head\": \"Dr. John Smith\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/departments",
+              "host": ["{{baseUrl}}"],
+              "path": ["departments"]
+            }
+          }
+        },
+        {
+          "name": "Update Department",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Computer Science & Engineering\",\n  \"head\": \"Dr. Jane Doe\",\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/departments/dept-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["departments", "dept-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Delete Department",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/departments/dept-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["departments", "dept-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Get Department Teachers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/departments/dept-id-here/teachers",
+              "host": ["{{baseUrl}}"],
+              "path": ["departments", "dept-id-here", "teachers"]
+            }
+          }
+        },
+        {
+          "name": "Get Department Classes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/departments/dept-id-here/classes",
+              "host": ["{{baseUrl}}"],
+              "path": ["departments", "dept-id-here", "classes"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Section Management",
+      "item": [
+        {
+          "name": "Get All Sections",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sections",
+              "host": ["{{baseUrl}}"],
+              "path": ["sections"]
+            }
+          }
+        },
+        {
+          "name": "Search Sections",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sections?classId=class-123&branchId=branch-456&search=A",
+              "host": ["{{baseUrl}}"],
+              "path": ["sections"],
+              "query": [
+                {
+                  "key": "classId",
+                  "value": "class-123"
+                },
+                {
+                  "key": "branchId",
+                  "value": "branch-456"
+                },
+                {
+                  "key": "search",
+                  "value": "A"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Section by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sections/section-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["sections", "section-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Create Section",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Section A\",\n  \"branchId\": \"branch-123\",\n  \"classId\": \"class-456\",\n  \"capacity\": 30,\n  \"teacherId\": \"teacher-789\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/sections",
+              "host": ["{{baseUrl}}"],
+              "path": ["sections"]
+            }
+          }
+        },
+        {
+          "name": "Update Section",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Section A Updated\",\n  \"capacity\": 35,\n  \"teacherId\": \"new-teacher-id\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/sections/section-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["sections", "section-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Delete Section",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sections/section-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["sections", "section-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Get Section Students",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sections/section-id-here/students",
+              "host": ["{{baseUrl}}"],
+              "path": ["sections", "section-id-here", "students"]
+            }
+          }
+        },
+        {
+          "name": "Assign Students to Section",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentIds\": [\"student-1\", \"student-2\", \"student-3\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/sections/section-id-here/assign-students",
+              "host": ["{{baseUrl}}"],
+              "path": ["sections", "section-id-here", "assign-students"]
+            }
+          }
+        },
+        {
+          "name": "Remove Student from Section",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sections/section-id-here/remove-student/student-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["sections", "section-id-here", "remove-student", "student-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Get Section Attendance Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sections/section-id-here/attendance-summary?startDate=2024-01-01&endDate=2024-12-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["sections", "section-id-here", "attendance-summary"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-12-31"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Exam Management",
+      "item": [
+        {
+          "name": "Get All Exams",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/exams",
+              "host": ["{{baseUrl}}"],
+              "path": ["exams"]
+            }
+          }
+        },
+        {
+          "name": "Search Exams",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/exams?classId=class-123&subject=Mathematics&type=MIDTERM&startDate=2024-01-01&endDate=2024-12-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["exams"],
+              "query": [
+                {
+                  "key": "classId",
+                  "value": "class-123"
+                },
+                {
+                  "key": "subject",
+                  "value": "Mathematics"
+                },
+                {
+                  "key": "type",
+                  "value": "MIDTERM"
+                },
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-12-31"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Exam by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/exams/exam-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["exams", "exam-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Create Exam (Professional+ Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Mathematics Midterm\",\n  \"type\": \"MIDTERM\",\n  \"subject\": \"Mathematics\",\n  \"branchId\": \"branch-123\",\n  \"classId\": \"class-456\",\n  \"totalMarks\": 100,\n  \"passingMarks\": 40,\n  \"examDate\": \"2024-03-15T09:00:00Z\",\n  \"duration\": 180,\n  \"teacherId\": \"teacher-789\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/exams",
+              "host": ["{{baseUrl}}"],
+              "path": ["exams"]
+            }
+          }
+        },
+        {
+          "name": "Update Exam",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Mathematics Midterm Updated\",\n  \"examDate\": \"2024-03-20T09:00:00Z\",\n  \"duration\": 120\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/exams/exam-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["exams", "exam-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Delete Exam",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/exams/exam-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["exams", "exam-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Get Exam Results",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/exams/exam-id-here/results",
+              "host": ["{{baseUrl}}"],
+              "path": ["exams", "exam-id-here", "results"]
+            }
+          }
+        },
+        {
+          "name": "Get Exam Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/exams/exam-id-here/statistics",
+              "host": ["{{baseUrl}}"],
+              "path": ["exams", "exam-id-here", "statistics"]
+            }
+          }
+        },
+        {
+          "name": "Generate Result Sheet",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/exams/exam-id-here/result-sheet",
+              "host": ["{{baseUrl}}"],
+              "path": ["exams", "exam-id-here", "result-sheet"]
+            }
+          }
+        },
+        {
+          "name": "Publish Exam Results",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/exams/exam-id-here/publish",
+              "host": ["{{baseUrl}}"],
+              "path": ["exams", "exam-id-here", "publish"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Results Management",
+      "item": [
+        {
+          "name": "Get All Results",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/results",
+              "host": ["{{baseUrl}}"],
+              "path": ["results"]
+            }
+          }
+        },
+        {
+          "name": "Filter Results",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/results?examId=exam-123&studentId=student-456&minMarks=50&maxMarks=100",
+              "host": ["{{baseUrl}}"],
+              "path": ["results"],
+              "query": [
+                {
+                  "key": "examId",
+                  "value": "exam-123"
+                },
+                {
+                  "key": "studentId",
+                  "value": "student-456"
+                },
+                {
+                  "key": "minMarks",
+                  "value": "50"
+                },
+                {
+                  "key": "maxMarks",
+                  "value": "100"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Result by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/results/result-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["results", "result-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Create Single Result",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"examId\": \"exam-123\",\n  \"studentId\": \"student-456\",\n  \"branchId\": \"branch-789\",\n  \"marksObtained\": 85,\n  \"remarks\": \"Good performance\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/results",
+              "host": ["{{baseUrl}}"],
+              "path": ["results"]
+            }
+          }
+        },
+        {
+          "name": "Create Bulk Results",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"examId\": \"exam-123\",\n  \"results\": [\n    {\n      \"studentId\": \"student-1\",\n      \"branchId\": \"branch-789\",\n      \"marksObtained\": 85,\n      \"remarks\": \"Excellent\"\n    },\n    {\n      \"studentId\": \"student-2\",\n      \"branchId\": \"branch-789\",\n      \"marksObtained\": 72,\n      \"remarks\": \"Good\"\n    },\n    {\n      \"studentId\": \"student-3\",\n      \"branchId\": \"branch-789\",\n      \"marksObtained\": 45,\n      \"remarks\": \"Needs improvement\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/results/bulk",
+              "host": ["{{baseUrl}}"],
+              "path": ["results", "bulk"]
+            }
+          }
+        },
+        {
+          "name": "Update Result",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"marksObtained\": 90,\n  \"remarks\": \"Excellent performance after review\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/results/result-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["results", "result-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Delete Result",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/results/result-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["results", "result-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Get Student All Results",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/results/student/student-id-here?subject=Mathematics&examType=MIDTERM",
+              "host": ["{{baseUrl}}"],
+              "path": ["results", "student", "student-id-here"],
+              "query": [
+                {
+                  "key": "subject",
+                  "value": "Mathematics"
+                },
+                {
+                  "key": "examType",
+                  "value": "MIDTERM"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Class Performance",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/results/class/class-id-here/performance?subject=Mathematics",
+              "host": ["{{baseUrl}}"],
+              "path": ["results", "class", "class-id-here", "performance"],
+              "query": [
+                {
+                  "key": "subject",
+                  "value": "Mathematics"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Attendance Management",
+      "item": [
+        {
+          "name": "Get All Attendance",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/attendance",
+              "host": ["{{baseUrl}}"],
+              "path": ["attendance"]
+            }
+          }
+        },
+        {
+          "name": "Filter Attendance",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/attendance?sectionId=section-123&date=2024-03-15&status=PRESENT&startDate=2024-01-01&endDate=2024-12-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["attendance"],
+              "query": [
+                {
+                  "key": "sectionId",
+                  "value": "section-123"
+                },
+                {
+                  "key": "date",
+                  "value": "2024-03-15"
+                },
+                {
+                  "key": "status",
+                  "value": "PRESENT"
+                },
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-12-31"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Attendance by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/attendance/attendance-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["attendance", "attendance-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Mark Single Attendance",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentId\": \"student-123\",\n  \"sectionId\": \"section-456\",\n  \"branchId\": \"branch-789\",\n  \"date\": \"2024-03-15\",\n  \"status\": \"PRESENT\",\n  \"remarks\": \"On time\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/attendance",
+              "host": ["{{baseUrl}}"],
+              "path": ["attendance"]
+            }
+          }
+        },
+        {
+          "name": "Mark Bulk Attendance (Entire Section)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2024-03-15\",\n  \"sectionId\": \"section-456\",\n  \"branchId\": \"branch-789\",\n  \"attendanceList\": [\n    {\n      \"studentId\": \"student-1\",\n      \"status\": \"PRESENT\",\n      \"remarks\": \"On time\"\n    },\n    {\n      \"studentId\": \"student-2\",\n      \"status\": \"ABSENT\",\n      \"remarks\": \"Sick leave\"\n    },\n    {\n      \"studentId\": \"student-3\",\n      \"status\": \"LATE\",\n      \"remarks\": \"Arrived 15 minutes late\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/attendance/bulk",
+              "host": ["{{baseUrl}}"],
+              "path": ["attendance", "bulk"]
+            }
+          }
+        },
+        {
+          "name": "Update Attendance",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"PRESENT\",\n  \"remarks\": \"Corrected - was actually present\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/attendance/attendance-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["attendance", "attendance-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Delete Attendance",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/attendance/attendance-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["attendance", "attendance-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Get Section Attendance for Date",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/attendance/section/section-id-here/date/2024-03-15",
+              "host": ["{{baseUrl}}"],
+              "path": ["attendance", "section", "section-id-here", "date", "2024-03-15"]
+            }
+          }
+        },
+        {
+          "name": "Get Student Attendance Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/attendance/student/student-id-here/summary?startDate=2024-01-01&endDate=2024-12-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["attendance", "student", "student-id-here", "summary"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-12-31"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Class Attendance Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/attendance/class/class-id-here/summary?startDate=2024-01-01&endDate=2024-12-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["attendance", "class", "class-id-here", "summary"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-12-31"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Daily Attendance Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/attendance/daily-report/2024-03-15?branchId=branch-123&sectionId=section-456",
+              "host": ["{{baseUrl}}"],
+              "path": ["attendance", "daily-report", "2024-03-15"],
+              "query": [
+                {
+                  "key": "branchId",
+                  "value": "branch-123"
+                },
+                {
+                  "key": "sectionId",
+                  "value": "section-456"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
       "name": "Plan Comparison Examples",
       "item": [
         {

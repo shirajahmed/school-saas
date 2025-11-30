@@ -111,6 +111,7 @@ model School {
   teachers        Teacher[]
   classes         Class[]
   exams           Exam[]
+  departments     Department[]    // For colleges
   onboardingData  OnboardingData?
   subscription    Subscription?
 
@@ -166,17 +167,38 @@ model Branch {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  school     School       @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  users      User[]
-  students   Student[]
-  teachers   Teacher[]
-  classes    Class[]
-  sections   Section[]
-  attendance Attendance[]
-  exams      Exam[]
-  results    Result[]
+  school       School       @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  users        User[]
+  students     Student[]
+  teachers     Teacher[]
+  classes      Class[]
+  sections     Section[]
+  departments  Department[] // For colleges
+  attendance   Attendance[]
+  exams        Exam[]
+  results      Result[]
 
   @@map("branches")
+}
+
+model Department {
+  id        String   @id @default(uuid())
+  schoolId  String
+  branchId  String?  // Optional - for multi-branch colleges
+  name      String   // Computer Science, Mathematics, etc.
+  code      String   // CS, MATH, etc.
+  head      String?  // Department head name
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  school   School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  branch   Branch?  @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  teachers Teacher[]
+  classes  Class[]
+
+  @@unique([schoolId, code])
+  @@map("departments")
 }
 
 model User {
@@ -302,6 +324,7 @@ model Teacher {
   id            String    @id @default(uuid())
   schoolId      String
   branchId      String
+  departmentId  String?   // Optional - for colleges
   userId        String    @unique
   employeeId    String
   subject       String?
@@ -312,33 +335,36 @@ model Teacher {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  school   School    @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  branch   Branch    @relation(fields: [branchId], references: [id], onDelete: Cascade)
-  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  classes  Class[]
-  sections Section[]
-  exams    Exam[]
+  school     School      @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  branch     Branch      @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  department Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  classes    Class[]
+  sections   Section[]
+  exams      Exam[]
 
   @@unique([schoolId, employeeId])
   @@map("teachers")
 }
 
 model Class {
-  id        String   @id @default(uuid())
-  schoolId  String
-  branchId  String
-  name      String
-  grade     Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String      @id @default(uuid())
+  schoolId     String
+  branchId     String
+  departmentId String?     // Optional - for colleges
+  name         String
+  grade        Int
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
 
-  school    School    @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  branch    Branch    @relation(fields: [branchId], references: [id], onDelete: Cascade)
-  teacher   Teacher?  @relation(fields: [teacherId], references: [id])
-  teacherId String?
-  students  Student[]
-  sections  Section[]
-  exams     Exam[]
+  school     School      @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  branch     Branch      @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  department Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  teacher    Teacher?    @relation(fields: [teacherId], references: [id])
+  teacherId  String?
+  students   Student[]
+  sections   Section[]
+  exams      Exam[]
 
   @@unique([schoolId, branchId, name])
   @@map("classes")
