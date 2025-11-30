@@ -29,25 +29,101 @@ enum OtpType {
   ACCOUNT_SETUP
 }
 
-model School {
-  id          String      @id @default(uuid())
-  name        String
-  email       String      @unique
-  phone       String?
-  address     String?
-  isActive    Boolean     @default(true)
-  onboarded   Boolean     @default(false)
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+enum SchoolType {
+  PRIMARY
+  HIGH_SCHOOL
+  COLLEGE
+  UNIVERSITY
+  MIXED
+}
 
-  branches    Branch[]
-  users       User[]
-  students    Student[]
-  teachers    Teacher[]
-  classes     Class[]
-  exams       Exam[]
+enum OnboardingStatus {
+  PENDING
+  BASIC_INFO
+  SUBSCRIPTION
+  PAYMENT
+  SETUP
+  COMPLETED
+}
+
+enum SubscriptionPlan {
+  STARTER
+  PROFESSIONAL
+  ENTERPRISE
+  CUSTOM
+}
+
+enum SubscriptionStatus {
+  TRIAL
+  ACTIVE
+  EXPIRED
+  CANCELLED
+}
+
+model School {
+  id              String            @id @default(uuid())
+  name            String
+  email           String            @unique
+  phone           String?
+  address         String?
+  logo            String?           // URL to uploaded logo
+  schoolType      SchoolType?
+  language        String?           @default("en")
+  academicYearStart Int?            // Month (1-12)
+  maxBranches     Int               @default(1)
+  isActive        Boolean           @default(true)
+  onboarded       Boolean           @default(false)
+  onboardingStatus OnboardingStatus @default(PENDING)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  branches        Branch[]
+  users           User[]
+  students        Student[]
+  teachers        Teacher[]
+  classes         Class[]
+  exams           Exam[]
+  onboardingData  OnboardingData?
+  subscription    Subscription?
 
   @@map("schools")
+}
+
+model OnboardingData {
+  id              String   @id @default(uuid())
+  schoolId        String   @unique
+  currentStep     Int      @default(1)
+  stepData        Json     @default("{}")
+  completedSteps  Int[]    @default([])
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@map("onboarding_data")
+}
+
+model Subscription {
+  id              String             @id @default(uuid())
+  schoolId        String             @unique
+  plan            SubscriptionPlan
+  status          SubscriptionStatus @default(TRIAL)
+  maxBranches     Int                @default(1)
+  maxStudents     Int                @default(100)
+  maxTeachers     Int                @default(10)
+  features        String[]           @default([])
+  startDate       DateTime           @default(now())
+  endDate         DateTime?
+  trialEndDate    DateTime?
+  paymentId       String?
+  amount          Decimal?
+  currency        String?            @default("USD")
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@map("subscriptions")
 }
 
 model Branch {
@@ -104,7 +180,7 @@ model UserToken {
   id        String   @id @default(uuid())
   userId    String
   token     String   @unique
-  type      String   // SETUP, REFRESH
+  type      String   // SETUP, REFRESH, ONBOARDING
   expiresAt DateTime
   isUsed    Boolean  @default(false)
   createdAt DateTime @default(now())

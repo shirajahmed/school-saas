@@ -195,55 +195,7 @@ export class AuthService {
     };
   }
 
-  // 4. Complete Onboarding (School Admin)
-  async completeOnboarding(dto: SetupAccountDto) {
-    const tokenRecord = await this.prisma.userToken.findUnique({
-      where: { token: dto.token },
-      include: { 
-        user: {
-          include: { school: true }
-        }
-      }
-    });
-
-    if (!tokenRecord || tokenRecord.isUsed || tokenRecord.expiresAt < new Date()) {
-      throw new BadRequestException('Invalid or expired onboarding token');
-    }
-
-    if (tokenRecord.user.role !== UserRole.SCHOOL_ADMIN) {
-      throw new BadRequestException('This token is not for school onboarding');
-    }
-
-    await this.prisma.$transaction(async (tx) => {
-      // Activate user
-      await tx.user.update({
-        where: { id: tokenRecord.userId },
-        data: {
-          status: UserStatus.ACTIVE,
-          phone: dto.phone || tokenRecord.user.phone,
-        }
-      });
-
-      // Mark school as onboarded
-      await tx.school.update({
-        where: { id: tokenRecord.user.schoolId },
-        data: { onboarded: true }
-      });
-
-      // Mark token as used
-      await tx.userToken.update({
-        where: { id: tokenRecord.id },
-        data: { isUsed: true }
-      });
-    });
-
-    return { 
-      message: 'Onboarding completed successfully. You can now login to your dashboard.',
-      schoolName: tokenRecord.user.school.name
-    };
-  }
-
-  // 5. Setup Account (Complete profile for regular users)
+  // 4. Setup Account (Complete profile for regular users)
   async setupAccount(dto: SetupAccountDto) {
     const tokenRecord = await this.prisma.userToken.findUnique({
       where: { token: dto.token },
@@ -277,35 +229,36 @@ export class AuthService {
     return { message: 'Account setup completed successfully' };
   }
 
-  // 5. Forgot Password
+  // 5. Forgot Password (Secure)
   async forgotPassword(dto: ForgotPasswordDto) {
     const user = await this.prisma.user.findUnique({
       where: { email: dto.email, status: UserStatus.ACTIVE }
     });
 
-    if (!user) {
-      // Don't reveal if email exists
-      return { message: 'If email exists, OTP has been sent' };
+    if (user) {
+      // Generate 6-digit OTP
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+      // Save OTP
+      await this.prisma.otp.create({
+        data: {
+          userId: user.id,
+          code: otp,
+          type: 'PASSWORD_RESET',
+          expiresAt
+        }
+      });
+
+      // Send OTP via email
+      await this.emailService.sendOtp(dto.email, otp);
+    } else {
+      // Add delay to prevent timing attacks (same time as DB operations above)
+      await new Promise(resolve => setTimeout(resolve, 200));
     }
 
-    // Generate 6-digit OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
-
-    // Save OTP
-    await this.prisma.otp.create({
-      data: {
-        userId: user.id,
-        code: otp,
-        type: 'PASSWORD_RESET',
-        expiresAt
-      }
-    });
-
-    // Send OTP via email
-    await this.emailService.sendOtp(dto.email, otp);
-
-    return { message: 'If email exists, OTP has been sent' };
+    // Always return same message regardless of email existence
+    return { message: 'If the email exists in our system, an OTP has been sent' };
   }
 
   // 6. Reset Password

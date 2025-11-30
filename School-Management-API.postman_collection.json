@@ -1,7 +1,7 @@
 {
   "info": {
-    "name": "School Management API",
-    "description": "Complete authentication flow for School Management System",
+    "name": "School Management API - Complete Flow",
+    "description": "Complete authentication and onboarding flow for School Management System",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -38,10 +38,10 @@
   ],
   "item": [
     {
-      "name": "School Onboarding Flow",
+      "name": "Complete Onboarding Flow",
       "item": [
         {
-          "name": "1. School Signup (Public)",
+          "name": "1. School Registration",
           "request": {
             "method": "POST",
             "header": [
@@ -76,7 +76,25 @@
           ]
         },
         {
-          "name": "2. Complete Onboarding (School Admin)",
+          "name": "2. Get Onboarding Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/onboarding/status?token={{onboardingToken}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["onboarding", "status"],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{onboardingToken}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "3. Step 1 - Basic School Info",
           "request": {
             "method": "POST",
             "header": [
@@ -87,17 +105,80 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"token\": \"{{onboardingToken}}\",\n  \"phone\": \"+1234567890\"\n}"
+              "raw": "{\n  \"token\": \"{{onboardingToken}}\",\n  \"step\": 1,\n  \"stepData\": {\n    \"schoolType\": \"HIGH_SCHOOL\",\n    \"language\": \"en\",\n    \"academicYearStart\": 4,\n    \"logo\": \"https://example.com/logo.png\"\n  }\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/auth/complete-onboarding",
+              "raw": "{{baseUrl}}/onboarding/step",
               "host": ["{{baseUrl}}"],
-              "path": ["auth", "complete-onboarding"]
+              "path": ["onboarding", "step"]
             }
           }
         },
         {
-          "name": "3. Login (School Admin)",
+          "name": "4. Step 2 - Subscription Selection",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"{{onboardingToken}}\",\n  \"step\": 2,\n  \"stepData\": {\n    \"plan\": \"PROFESSIONAL\",\n    \"maxBranches\": 3,\n    \"features\": [\"attendance\", \"grades\", \"reports\", \"communication\"]\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/onboarding/step",
+              "host": ["{{baseUrl}}"],
+              "path": ["onboarding", "step"]
+            }
+          }
+        },
+        {
+          "name": "5. Step 3 - Payment Processing",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"{{onboardingToken}}\",\n  \"step\": 3,\n  \"stepData\": {\n    \"paymentMethod\": \"stripe\",\n    \"paymentToken\": \"tok_visa\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/onboarding/step",
+              "host": ["{{baseUrl}}"],
+              "path": ["onboarding", "step"]
+            }
+          }
+        },
+        {
+          "name": "6. Complete Onboarding",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"{{onboardingToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/onboarding/complete",
+              "host": ["{{baseUrl}}"],
+              "path": ["onboarding", "complete"]
+            }
+          }
+        },
+        {
+          "name": "7. Login to Dashboard",
           "request": {
             "method": "POST",
             "header": [
@@ -134,10 +215,51 @@
       ]
     },
     {
+      "name": "Onboarding Helper Endpoints",
+      "item": [
+        {
+          "name": "Get Subscription Plans",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/onboarding/plans",
+              "host": ["{{baseUrl}}"],
+              "path": ["onboarding", "plans"]
+            }
+          }
+        },
+        {
+          "name": "Get School Types",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/onboarding/school-types",
+              "host": ["{{baseUrl}}"],
+              "path": ["onboarding", "school-types"]
+            }
+          }
+        },
+        {
+          "name": "Get Languages",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/onboarding/languages",
+              "host": ["{{baseUrl}}"],
+              "path": ["onboarding", "languages"]
+            }
+          }
+        }
+      ]
+    },
+    {
       "name": "User Management Flow",
       "item": [
         {
-          "name": "1. Create User (Admin Only)",
+          "name": "Create Teacher",
           "request": {
             "method": "POST",
             "header": [
@@ -159,142 +281,10 @@
               "host": ["{{baseUrl}}"],
               "path": ["auth", "create-user"]
             }
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "if (pm.response.code === 201) {",
-                  "    const response = pm.response.json();",
-                  "    pm.collectionVariables.set('setupToken', response.setupToken);",
-                  "}"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "2. Setup Account (New User)",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"token\": \"{{setupToken}}\",\n  \"password\": \"newpassword123\",\n  \"phone\": \"+1234567891\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/auth/setup-account",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "setup-account"]
-            }
           }
         },
         {
-          "name": "3. Login (New User)",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"identifier\": \"jane.teacher@abcschool.com\",\n  \"password\": \"newpassword123\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/auth/login",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "login"]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Password Reset Flow",
-      "item": [
-        {
-          "name": "1. Forgot Password (Send OTP)",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"admin@abcschool.com\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/auth/forgot-password",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "forgot-password"]
-            }
-          }
-        },
-        {
-          "name": "2. Reset Password (With OTP)",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"admin@abcschool.com\",\n  \"otp\": \"123456\",\n  \"newPassword\": \"newpassword456\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/auth/reset-password",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "reset-password"]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "User Creation Examples",
-      "item": [
-        {
-          "name": "Create Branch Admin",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{accessToken}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"firstName\": \"Bob\",\n  \"lastName\": \"BranchAdmin\",\n  \"email\": \"bob.admin@abcschool.com\",\n  \"role\": \"BRANCH_ADMIN\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/auth/create-user",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "create-user"]
-            }
-          }
-        },
-        {
-          "name": "Create Student (Auto-creates Parent)",
+          "name": "Create Student",
           "request": {
             "method": "POST",
             "header": [
@@ -317,39 +307,14 @@
               "path": ["auth", "create-user"]
             }
           }
-        },
-        {
-          "name": "Create Parent (Manual)",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{accessToken}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"firstName\": \"Mary\",\n  \"lastName\": \"Parent\",\n  \"email\": \"mary.parent@gmail.com\",\n  \"phone\": \"+1234567893\",\n  \"role\": \"PARENT\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/auth/create-user",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "create-user"]
-            }
-          }
         }
       ]
     },
     {
-      "name": "Token Management",
+      "name": "Password Reset Flow",
       "item": [
         {
-          "name": "Refresh Token",
+          "name": "Forgot Password",
           "request": {
             "method": "POST",
             "header": [
@@ -360,28 +325,35 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+              "raw": "{\n  \"email\": \"admin@abcschool.com\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/auth/refresh",
+              "raw": "{{baseUrl}}/auth/forgot-password",
               "host": ["{{baseUrl}}"],
-              "path": ["auth", "refresh"]
+              "path": ["auth", "forgot-password"]
             }
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "if (pm.response.code === 200) {",
-                  "    const response = pm.response.json();",
-                  "    pm.collectionVariables.set('accessToken', response.accessToken);",
-                  "    pm.collectionVariables.set('refreshToken', response.refreshToken);",
-                  "}"
-                ]
+          }
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@abcschool.com\",\n  \"otp\": \"123456\",\n  \"newPassword\": \"newpassword456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/reset-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "reset-password"]
             }
-          ]
+          }
         }
       ]
     },

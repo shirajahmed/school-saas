@@ -2,7 +2,9 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { AuthController } from './auth.controller';
+import { OnboardingController } from './onboarding.controller';
 import { AuthService } from './services/auth.service';
+import { OnboardingService } from './services/onboarding.service';
 import { EmailService } from './services/email.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
@@ -18,14 +20,15 @@ import { CommonModule } from '../common/common.module';
       signOptions: { expiresIn: '15m' },
     }),
   ],
-  controllers: [AuthController],
+  controllers: [AuthController, OnboardingController],
   providers: [
     AuthService,
+    OnboardingService,
     EmailService,
     JwtStrategy,
     JwtAuthGuard,
     RolesGuard,
   ],
-  exports: [AuthService, JwtAuthGuard, RolesGuard],
+  exports: [AuthService, OnboardingService, JwtAuthGuard, RolesGuard],
 })
 export class AuthModule {}

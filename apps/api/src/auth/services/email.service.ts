@@ -29,6 +29,65 @@ export class EmailService {
     }
   }
 
+  async sendWelcomeEmail(email: string, schoolName: string, firstName: string) {
+    if (!this.isConfigured) {
+      console.log('Email not configured. Welcome email for', email);
+      return;
+    }
+
+    const dashboardUrl = `${process.env.FRONTEND_URL}/dashboard`;
+    
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: `Welcome to ${schoolName} Dashboard! 🎉`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h1 style="color: #28a745; text-align: center;">🎉 Welcome to Your School Dashboard!</h1>
+          
+          <p>Dear ${firstName},</p>
+          
+          <p>Congratulations! Your school <strong>${schoolName}</strong> has been successfully set up on our School Management System.</p>
+          
+          <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3 style="color: #495057; margin-top: 0;">🚀 What's Next?</h3>
+            <ul style="color: #6c757d;">
+              <li>Access your admin dashboard</li>
+              <li>Add teachers and staff members</li>
+              <li>Create student accounts</li>
+              <li>Set up classes and subjects</li>
+              <li>Configure school settings</li>
+            </ul>
+          </div>
+          
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${dashboardUrl}" style="background: #007bff; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-size: 16px; display: inline-block;">
+              Access Your Dashboard
+            </a>
+          </div>
+          
+          <div style="background: #e9ecef; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <h4 style="color: #495057; margin-top: 0;">📞 Need Help?</h4>
+            <p style="margin-bottom: 0; color: #6c757d;">
+              Our support team is here to help you get started. Contact us anytime!
+            </p>
+          </div>
+          
+          <p style="color: #6c757d; font-size: 14px; text-align: center;">
+            Thank you for choosing our School Management System!
+          </p>
+        </div>
+      `,
+    };
+
+    try {
+      await this.transporter.sendMail(mailOptions);
+      console.log('Welcome email sent to:', email);
+    } catch (error) {
+      console.error('Failed to send welcome email:', error.message);
+    }
+  }
+
   async sendOnboardingEmail(email: string, schoolName: string, onboardingToken: string) {
     if (!this.isConfigured) {
       console.log('Email not configured. Onboarding token for', email, 'is:', onboardingToken);

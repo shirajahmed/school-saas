@@ -29,14 +29,7 @@ export class AuthController {
     return this.authService.createUser(dto, req.user.sub);
   }
 
-  // 4. Complete Onboarding (School Admin)
-  @Post('complete-onboarding')
-  @HttpCode(HttpStatus.OK)
-  async completeOnboarding(@Body() dto: SetupAccountDto) {
-    return this.authService.completeOnboarding(dto);
-  }
-
-  // 5. User Account Setup (Public with token)
+  // 4. User Account Setup (Public with token)
   @Post('setup-account')
   @HttpCode(HttpStatus.OK)
   async setupAccount(@Body() dto: SetupAccountDto) {

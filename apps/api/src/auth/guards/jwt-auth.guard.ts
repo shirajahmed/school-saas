@@ -1,4 +1,4 @@
-import { Injectable, ExecutionContext } from '@nestjs/common';
+import { Injectable, ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { TenantProvider } from '../../common/tenant/tenant.provider';
 
@@ -10,16 +10,18 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
   handleRequest(err: any, user: any, info: any, context: ExecutionContext) {
     if (err || !user) {
-      throw err || new Error('Unauthorized');
+      throw new UnauthorizedException('Invalid or missing authentication token');
     }
 
-    // Set tenant context
+    // Set tenant context with correct property names
     const tenantContext = {
       schoolId: user.schoolId,
       branchId: user.branchId,
-      userId: user.userId,
+      userId: user.sub, // JWT payload uses 'sub' for user ID
     };
 
-    return this.tenantProvider.run(tenantContext, () => user);
+    // Set tenant context and return user
+    this.tenantProvider.run(tenantContext, () => {});
+    return user;
   }
 }
