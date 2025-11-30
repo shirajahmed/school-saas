@@ -114,8 +114,16 @@ export class AuthService {
       throw new ForbiddenException('Account not activated. Complete setup first.');
     }
 
-    if (!user.school.isActive) {
-      throw new ForbiddenException('School account is suspended');
+    // Platform-level admins (Master Super Admin, Super Admin) don't need school validation
+    if (user.school) {
+      if (!user.school.isActive) {
+        throw new ForbiddenException('School account is suspended');
+      }
+
+      // Check onboarding for school admin
+      if (user.role === UserRole.SCHOOL_ADMIN && !user.school.onboarded) {
+        throw new ForbiddenException('Complete school onboarding first');
+      }
     }
 
     // Update last login

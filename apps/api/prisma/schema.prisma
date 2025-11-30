@@ -8,12 +8,40 @@ datasource db {
 }
 
 enum UserRole {
-  SUPER_ADMIN
-  SCHOOL_ADMIN
-  BRANCH_ADMIN
+  MASTER_SUPER_ADMIN  // Ultimate control - only you
+  SUPER_ADMIN         // Platform level admin
+  SCHOOL_ADMIN        // School level admin
+  BRANCH_ADMIN        // Branch level admin
+  SUB_BRANCH_ADMIN    // Sub branch admin
   TEACHER
   STUDENT
   PARENT
+}
+
+enum PermissionAction {
+  CREATE
+  READ
+  UPDATE
+  DELETE
+  MANAGE
+  VIEW_ONLY
+}
+
+enum PermissionResource {
+  USERS
+  SCHOOLS
+  BRANCHES
+  STUDENTS
+  TEACHERS
+  PARENTS
+  CLASSES
+  ATTENDANCE
+  EXAMS
+  REPORTS
+  SETTINGS
+  SUBSCRIPTIONS
+  PAYMENTS
+  ANALYTICS
 }
 
 enum UserStatus {
@@ -153,7 +181,7 @@ model Branch {
 
 model User {
   id          String     @id @default(uuid())
-  schoolId    String
+  schoolId    String?    // Null for platform admins
   branchId    String?
   email       String     @unique
   phone       String?
@@ -162,16 +190,21 @@ model User {
   lastName    String
   role        UserRole
   status      UserStatus @default(PENDING)
+  isMaster    Boolean    @default(false) // Only for MASTER_SUPER_ADMIN
+  createdBy   String?    // Who created this user
   lastLogin   DateTime?
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 
-  school   School    @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  branch   Branch?   @relation(fields: [branchId], references: [id], onDelete: SetNull)
-  student  Student?
-  teacher  Teacher?
-  otps     Otp[]
-  tokens   UserToken[]
+  school         School?         @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  branch         Branch?         @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  creator        User?           @relation("UserCreator", fields: [createdBy], references: [id])
+  createdUsers   User[]          @relation("UserCreator")
+  student        Student?
+  teacher        Teacher?
+  otps           Otp[]
+  tokens         UserToken[]
+  rolePermissions RolePermission[]
 
   @@map("users")
 }
@@ -188,6 +221,36 @@ model UserToken {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("user_tokens")
+}
+
+model RolePermission {
+  id         String             @id @default(uuid())
+  userId     String
+  resource   PermissionResource
+  actions    PermissionAction[]
+  conditions Json?              // Additional conditions like "own_branch_only"
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, resource])
+  @@map("role_permissions")
+}
+
+model PermissionTemplate {
+  id          String             @id @default(uuid())
+  name        String             @unique
+  description String?
+  role        UserRole
+  resource    PermissionResource
+  actions     PermissionAction[]
+  conditions  Json?
+  isDefault   Boolean            @default(false)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  @@map("permission_templates")
 }
 
 model Otp {

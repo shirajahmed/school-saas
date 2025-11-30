@@ -358,6 +358,673 @@
       ]
     },
     {
+      "name": "Admin Permission Management",
+      "item": [
+        {
+          "name": "Master Admin Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identifier\": \"master@schoolsaas.com\",\n  \"password\": \"MasterAdmin@2024!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('accessToken', response.accessToken);",
+                  "    pm.collectionVariables.set('refreshToken', response.refreshToken);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Super Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"SuperAdmin\",\n  \"email\": \"john.superadmin@company.com\",\n  \"phone\": \"+1234567890\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/super-admin",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "super-admin"]
+            }
+          }
+        },
+        {
+          "name": "List All Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users"]
+            }
+          }
+        },
+        {
+          "name": "List Users by Role",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users?role=BRANCH_ADMIN",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users"],
+              "query": [
+                {
+                  "key": "role",
+                  "value": "BRANCH_ADMIN"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Assign Custom Permissions",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resource\": \"STUDENTS\",\n  \"actions\": [\"CREATE\", \"READ\", \"UPDATE\"],\n  \"conditions\": {\n    \"own_branch_only\": true\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/permissions/user-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "permissions", "user-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Get User Permissions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/permissions/user-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "permissions", "user-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Update User Role",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"SUB_BRANCH_ADMIN\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/user-id-here/role",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users", "user-id-here", "role"]
+            }
+          }
+        },
+        {
+          "name": "Deactivate User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/user-id-here/deactivate",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users", "user-id-here", "deactivate"]
+            }
+          }
+        },
+        {
+          "name": "Get System Analytics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/analytics",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "analytics"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Permission Examples",
+      "item": [
+        {
+          "name": "Give Branch Admin User Creation Rights",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resource\": \"USERS\",\n  \"actions\": [\"CREATE\", \"READ\"],\n  \"conditions\": {\n    \"own_branch_only\": true,\n    \"roles_allowed\": [\"TEACHER\", \"STUDENT\"]\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/permissions/branch-admin-id",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "permissions", "branch-admin-id"]
+            }
+          }
+        },
+        {
+          "name": "Give Teacher Report Access",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resource\": \"REPORTS\",\n  \"actions\": [\"READ\", \"CREATE\"],\n  \"conditions\": {\n    \"own_classes_only\": true\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/permissions/teacher-id",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "permissions", "teacher-id"]
+            }
+          }
+        },
+        {
+          "name": "Give Sub-Branch Admin Limited Access",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resource\": \"STUDENTS\",\n  \"actions\": [\"READ\", \"UPDATE\"],\n  \"conditions\": {\n    \"own_branch_only\": true\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/permissions/sub-branch-admin-id",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "permissions", "sub-branch-admin-id"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Subscription Management",
+      "item": [
+        {
+          "name": "Get School Subscription",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscription/school-subscription",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription", "school-subscription"]
+            }
+          }
+        },
+        {
+          "name": "Update Subscription Plan",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"newPlan\": \"PROFESSIONAL\",\n  \"paymentId\": \"pay_123456789\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscription/update-plan",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription", "update-plan"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Subscription Feature Tests",
+      "item": [
+        {
+          "name": "✅ Basic Attendance (All Plans)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentId\": \"student-123\",\n  \"date\": \"2024-11-30\",\n  \"status\": \"PRESENT\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscription-example/basic-attendance",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription-example", "basic-attendance"]
+            }
+          }
+        },
+        {
+          "name": "❌ Advanced Reports (Professional+ Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reportType\": \"advanced_analytics\",\n  \"dateRange\": \"last_month\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscription-example/advanced-reports",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription-example", "advanced-reports"]
+            }
+          }
+        },
+        {
+          "name": "❌ Send SMS (Professional+ Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Your child was absent today\",\n  \"recipients\": [\"parent1\", \"parent2\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscription-example/send-sms",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription-example", "send-sms"]
+            }
+          }
+        },
+        {
+          "name": "❌ Multi-Branch Management (Enterprise+ Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"transfer_student\",\n  \"fromBranch\": \"branch-1\",\n  \"toBranch\": \"branch-2\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscription-example/manage-branches",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription-example", "manage-branches"]
+            }
+          }
+        },
+        {
+          "name": "❌ API Access (Enterprise+ Only)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscription-example/api-data",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription-example", "api-data"]
+            }
+          }
+        },
+        {
+          "name": "❌ White Label Branding (Enterprise+ Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"logo\": \"https://school.com/logo.png\",\n  \"primaryColor\": \"#007bff\",\n  \"companyName\": \"ABC School\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscription-example/customize-branding",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription-example", "customize-branding"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Subscription Limit Tests",
+      "item": [
+        {
+          "name": "🔢 Create Branch (Check Limit)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"North Branch\",\n  \"address\": \"123 North Street\",\n  \"phone\": \"+1234567890\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscription-example/create-branch",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription-example", "create-branch"]
+            }
+          }
+        },
+        {
+          "name": "🔢 Add Student (Check Limit)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Student\",\n  \"email\": \"john.student@school.com\",\n  \"rollNumber\": \"2024001\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscription-example/add-student",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription-example", "add-student"]
+            }
+          }
+        },
+        {
+          "name": "🔢 Add Teacher (Check Limit)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Teacher\",\n  \"email\": \"jane.teacher@school.com\",\n  \"subject\": \"Mathematics\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscription-example/add-teacher",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription-example", "add-teacher"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Plan Comparison Examples",
+      "item": [
+        {
+          "name": "STARTER Plan Limits",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/onboarding/plans",
+              "host": ["{{baseUrl}}"],
+              "path": ["onboarding", "plans"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// STARTER Plan:",
+                  "// - Max 1 Branch",
+                  "// - Max 100 Students", 
+                  "// - Max 10 Teachers",
+                  "// - Basic features only",
+                  "",
+                  "pm.test('Shows STARTER plan limits', function () {",
+                  "    const response = pm.response.json();",
+                  "    const starter = response.plans.find(p => p.id === 'STARTER');",
+                  "    pm.expect(starter.maxBranches).to.eql(1);",
+                  "    pm.expect(starter.maxStudents).to.eql(100);",
+                  "    pm.expect(starter.maxTeachers).to.eql(10);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Test Feature Access by Plan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"note\": \"This request will show different responses based on your subscription plan:\",\n  \"examples\": {\n    \"STARTER\": \"❌ Feature not available in your plan\",\n    \"PROFESSIONAL\": \"✅ Advanced report generated\",\n    \"ENTERPRISE\": \"✅ Advanced report generated\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscription-example/advanced-reports",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription-example", "advanced-reports"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Permission Templates",
+      "item": [
+        {
+          "name": "Get Permission Templates",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/permission-templates",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "permission-templates"]
+            }
+          }
+        },
+        {
+          "name": "Create Permission Template",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Teacher Full Access\",\n  \"description\": \"Full access to teaching resources\",\n  \"role\": \"TEACHER\",\n  \"resource\": \"STUDENTS\",\n  \"actions\": [\"READ\", \"UPDATE\"],\n  \"conditions\": {\n    \"own_classes_only\": true\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/permission-templates",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "permission-templates"]
+            }
+          }
+        }
+      ]
+    },
+    {
       "name": "Health Check",
       "request": {
         "method": "GET",
