@@ -29,6 +29,44 @@ export class EmailService {
     }
   }
 
+  async sendNotificationEmail(email: string, title: string, message: string, firstName: string) {
+    if (!this.isConfigured) {
+      console.log('Email not configured. Notification email for', email);
+      return;
+    }
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: title,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+            <h2 style="color: #495057; margin-top: 0;">📢 ${title}</h2>
+            
+            <p>Dear ${firstName},</p>
+            
+            <div style="background: white; padding: 20px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #007bff;">
+              ${message.replace(/\n/g, '<br>')}
+            </div>
+            
+            <p style="color: #6c757d; font-size: 14px; margin-top: 30px;">
+              This is an automated notification from your School Management System.
+            </p>
+          </div>
+        </div>
+      `,
+    };
+
+    try {
+      await this.transporter.sendMail(mailOptions);
+      console.log('Notification email sent to:', email);
+    } catch (error) {
+      console.error('Failed to send notification email:', error.message);
+      throw error;
+    }
+  }
+
   async sendWelcomeEmail(email: string, schoolName: string, firstName: string) {
     if (!this.isConfigured) {
       console.log('Email not configured. Welcome email for', email);

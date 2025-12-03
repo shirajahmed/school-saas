@@ -39,6 +39,6 @@ import { CommonModule } from '../common/common.module';
     PermissionGuard,
     SubscriptionGuard,
   ],
-  exports: [AuthService, OnboardingService, PermissionService, SubscriptionService, JwtAuthGuard, RolesGuard, PermissionGuard, SubscriptionGuard],
+  exports: [AuthService, OnboardingService, PermissionService, SubscriptionService, EmailService, JwtAuthGuard, RolesGuard, PermissionGuard, SubscriptionGuard],
 })
 export class AuthModule {}

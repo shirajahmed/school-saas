@@ -114,6 +114,10 @@ model School {
   departments     Department[]    // For colleges
   onboardingData  OnboardingData?
   subscription    Subscription?
+  notifications   Notification[]
+  events          Event[]
+  holidays        Holiday[]
+  auditLogs       AuditLog[]
 
   @@map("schools")
 }
@@ -177,6 +181,9 @@ model Branch {
   attendance   Attendance[]
   exams        Exam[]
   results      Result[]
+  notifications Notification[]
+  events       Event[]
+  holidays     Holiday[]
 
   @@map("branches")
 }
@@ -199,6 +206,191 @@ model Department {
 
   @@unique([schoolId, code])
   @@map("departments")
+}
+
+enum NotificationType {
+  ANNOUNCEMENT
+  REMINDER
+  ALERT
+  EVENT
+  HOLIDAY
+  EXAM_RESULT
+  ATTENDANCE_ALERT
+  FEE_DUE
+}
+
+enum NotificationChannel {
+  IN_APP
+  EMAIL
+  SMS
+  PUSH
+}
+
+enum DeliveryStatus {
+  PENDING
+  DELIVERED
+  FAILED
+  RETRY
+}
+
+enum EventType {
+  ACADEMIC
+  SPORTS
+  CULTURAL
+  MEETING
+  EXAM
+  HOLIDAY
+  OTHER
+}
+
+enum RecurrenceType {
+  NONE
+  DAILY
+  WEEKLY
+  MONTHLY
+  YEARLY
+}
+
+enum TargetType {
+  ALL_USERS
+  SPECIFIC_ROLES
+  SPECIFIC_USERS
+  BRANCH_WISE
+  CLASS_WISE
+  SECTION_WISE
+}
+
+model Notification {
+  id              String             @id @default(uuid())
+  schoolId        String
+  branchId        String?            // Null for school-wide
+  title           String
+  message         String
+  type            NotificationType
+  channels        NotificationChannel[]
+  targetType      TargetType
+  targetRoles     UserRole[]         @default([])
+  targetUserIds   String[]           @default([])
+  targetBranchIds String[]           @default([])
+  targetClassIds  String[]           @default([])
+  targetSectionIds String[]          @default([])
+  filters         Json?              // Additional filters
+  scheduledAt     DateTime?          // For scheduled notifications
+  expiresAt       DateTime?
+  isActive        Boolean            @default(true)
+  createdBy       String
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  school      School                 @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  branch      Branch?                @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  creator     User                   @relation("NotificationCreator", fields: [createdBy], references: [id])
+  deliveries  NotificationDelivery[]
+
+  @@map("notifications")
+}
+
+model NotificationDelivery {
+  id             String          @id @default(uuid())
+  notificationId String
+  userId         String
+  channel        NotificationChannel
+  status         DeliveryStatus  @default(PENDING)
+  deliveredAt    DateTime?
+  failureReason  String?
+  retryCount     Int             @default(0)
+  metadata       Json?           // Channel-specific data
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  notification Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([notificationId, userId, channel])
+  @@map("notification_deliveries")
+}
+
+model Event {
+  id            String         @id @default(uuid())
+  schoolId      String
+  branchId      String?        // Null for school-wide
+  title         String
+  description   String?
+  type          EventType
+  startDate     DateTime
+  endDate       DateTime
+  isAllDay      Boolean        @default(false)
+  location      String?
+  recurrenceType RecurrenceType @default(NONE)
+  recurrenceEnd  DateTime?
+  recurrenceData Json?          // Recurrence rules
+  isActive      Boolean        @default(true)
+  createdBy     String
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  school    School     @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  branch    Branch?    @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  creator   User       @relation("EventCreator", fields: [createdBy], references: [id])
+
+  @@map("events")
+}
+
+model Holiday {
+  id          String    @id @default(uuid())
+  schoolId    String
+  branchId    String?   // Null for school-wide
+  name        String
+  description String?
+  date        DateTime
+  isRecurring Boolean   @default(false)
+  recurrenceData Json?  // Yearly recurrence rules
+  affectsAttendance Boolean @default(true)
+  affectsTimetable  Boolean @default(true)
+  isActive    Boolean   @default(true)
+  createdBy   String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  school    School     @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  branch    Branch?    @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  creator   User       @relation("HolidayCreator", fields: [createdBy], references: [id])
+
+  @@map("holidays")
+}
+
+model NotificationPreference {
+  id        String                @id @default(uuid())
+  userId    String
+  channel   NotificationChannel
+  enabled   Boolean               @default(true)
+  dndStart  String?               // "22:00" format
+  dndEnd    String?               // "08:00" format
+  types     NotificationType[]    @default([])
+  createdAt DateTime              @default(now())
+  updatedAt DateTime              @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, channel])
+  @@map("notification_preferences")
+}
+
+model AuditLog {
+  id           String    @id @default(uuid())
+  schoolId     String
+  entityType   String    // "notification", "event", "holiday"
+  entityId     String
+  action       String    // "CREATE", "UPDATE", "DELETE"
+  oldValues    Json?
+  newValues    Json?
+  performedBy  String
+  performedAt  DateTime  @default(now())
+
+  school       School        @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  performer    User          @relation("AuditPerformer", fields: [performedBy], references: [id])
+
+  @@map("audit_logs")
 }
 
 model User {
@@ -227,6 +419,12 @@ model User {
   otps           Otp[]
   tokens         UserToken[]
   rolePermissions RolePermission[]
+  createdNotifications Notification[] @relation("NotificationCreator")
+  notificationDeliveries NotificationDelivery[]
+  notificationPreferences NotificationPreference[]
+  createdEvents  Event[]    @relation("EventCreator")
+  createdHolidays Holiday[] @relation("HolidayCreator")
+  auditLogs      AuditLog[] @relation("AuditPerformer")
 
   @@map("users")
 }

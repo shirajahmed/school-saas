@@ -11,6 +11,7 @@ import { DepartmentsModule } from "./departments/departments.module";
 import { ExamsModule } from "./exams/exams.module";
 import { ResultsModule } from "./results/results.module";
 import { AttendanceModule } from "./attendance/attendance.module";
+import { NotificationsModule } from "./notifications/notifications.module";
 
 @Module({
   imports: [
@@ -23,7 +24,8 @@ import { AttendanceModule } from "./attendance/attendance.module";
     DepartmentsModule,
     ExamsModule,
     ResultsModule,
-    AttendanceModule
+    AttendanceModule,
+    NotificationsModule
   ],
   controllers: [AppController],
   providers: [AppService],

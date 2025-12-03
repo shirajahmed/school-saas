@@ -25,6 +25,11 @@ export class PermissionService {
       return true;
     }
 
+    // Super Admin has most permissions (platform level)
+    if (user.role === UserRole.SUPER_ADMIN) {
+      return true;
+    }
+
     // Check role-based permissions
     const permission = user.rolePermissions.find(p => p.resource === resource);
     
@@ -179,7 +184,10 @@ export class PermissionService {
         { resource: PermissionResource.STUDENTS, actions: [PermissionAction.MANAGE] },
         { resource: PermissionResource.TEACHERS, actions: [PermissionAction.MANAGE] },
         { resource: PermissionResource.CLASSES, actions: [PermissionAction.MANAGE] },
-        { resource: PermissionResource.REPORTS, actions: [PermissionAction.READ] }
+        { resource: PermissionResource.REPORTS, actions: [PermissionAction.READ] },
+        { resource: PermissionResource.SETTINGS, actions: [PermissionAction.MANAGE] },
+        { resource: PermissionResource.EXAMS, actions: [PermissionAction.MANAGE] },
+        { resource: PermissionResource.ATTENDANCE, actions: [PermissionAction.MANAGE] }
       ],
       [UserRole.BRANCH_ADMIN]: [
         { resource: PermissionResource.USERS, actions: [PermissionAction.CREATE, PermissionAction.READ, PermissionAction.UPDATE] },

@@ -2630,6 +2630,626 @@
       ]
     },
     {
+      "name": "Notification System",
+      "item": [
+        {
+          "name": "Create Basic Notification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Important Announcement\",\n  \"message\": \"This is a test notification for all users in the school.\",\n  \"type\": \"ANNOUNCEMENT\",\n  \"channels\": [\"IN_APP\", \"EMAIL\"],\n  \"targetType\": \"ALL_USERS\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"]
+            }
+          }
+        },
+        {
+          "name": "Create Role-Based Notification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Teacher Meeting Reminder\",\n  \"message\": \"Monthly teacher meeting scheduled for tomorrow at 3 PM in the conference room.\",\n  \"type\": \"REMINDER\",\n  \"channels\": [\"IN_APP\", \"EMAIL\", \"SMS\"],\n  \"targetType\": \"SPECIFIC_ROLES\",\n  \"targetRoles\": [\"TEACHER\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"]
+            }
+          }
+        },
+        {
+          "name": "Create Class-Specific Notification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Class 10 Exam Schedule\",\n  \"message\": \"Mathematics exam has been rescheduled to next Monday. Please prepare accordingly.\",\n  \"type\": \"ALERT\",\n  \"channels\": [\"IN_APP\", \"EMAIL\", \"SMS\"],\n  \"targetType\": \"CLASS_WISE\",\n  \"targetClassIds\": [\"class-10-id\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"]
+            }
+          }
+        },
+        {
+          "name": "Create Filtered Notification (Parents of Class 5)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Parent-Teacher Meeting\",\n  \"message\": \"Parent-teacher meeting for Class 5 students scheduled for this Saturday at 10 AM.\",\n  \"type\": \"EVENT\",\n  \"channels\": [\"IN_APP\", \"EMAIL\", \"SMS\"],\n  \"targetType\": \"CLASS_WISE\",\n  \"targetClassIds\": [\"class-5-id\"],\n  \"filters\": {\n    \"parentsOfClass\": \"class-5-id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"]
+            }
+          }
+        },
+        {
+          "name": "Create Scheduled Notification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Exam Reminder\",\n  \"message\": \"Your Mathematics exam is tomorrow. Good luck!\",\n  \"type\": \"REMINDER\",\n  \"channels\": [\"IN_APP\", \"EMAIL\"],\n  \"targetType\": \"SPECIFIC_ROLES\",\n  \"targetRoles\": [\"STUDENT\"],\n  \"scheduledAt\": \"2024-12-01T08:00:00Z\",\n  \"expiresAt\": \"2024-12-01T18:00:00Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"]
+            }
+          }
+        },
+        {
+          "name": "Create Branch-Specific Notification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Branch Holiday Notice\",\n  \"message\": \"Main branch will be closed tomorrow due to maintenance work.\",\n  \"type\": \"ALERT\",\n  \"channels\": [\"IN_APP\", \"EMAIL\", \"SMS\"],\n  \"targetType\": \"BRANCH_WISE\",\n  \"targetBranchIds\": [\"main-branch-id\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"]
+            }
+          }
+        },
+        {
+          "name": "Create Section-Specific Notification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Section A Field Trip\",\n  \"message\": \"Section A students, don't forget to bring your permission slips for tomorrow's field trip.\",\n  \"type\": \"REMINDER\",\n  \"channels\": [\"IN_APP\", \"EMAIL\"],\n  \"targetType\": \"SECTION_WISE\",\n  \"targetSectionIds\": [\"section-a-id\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"]
+            }
+          }
+        },
+        {
+          "name": "Get My Notifications",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notifications/my-notifications?limit=20&offset=0",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications", "my-notifications"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "offset",
+                  "value": "0"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Mark Notification as Read",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notifications/delivery-id-here/read",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications", "delivery-id-here", "read"]
+            }
+          }
+        },
+        {
+          "name": "Send Test Notification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Test Notification\",\n  \"message\": \"This is a test notification to verify the system is working correctly.\",\n  \"channels\": [\"IN_APP\", \"EMAIL\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications/test",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications", "test"]
+            }
+          }
+        },
+        {
+          "name": "Broadcast School Announcement",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"🎉 School Achievement\",\n  \"message\": \"Congratulations! Our school has won the inter-school science competition. Well done to all participants!\",\n  \"channels\": [\"IN_APP\", \"EMAIL\", \"SMS\", \"PUSH\"],\n  \"targetType\": \"ALL_USERS\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications/broadcast",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications", "broadcast"]
+            }
+          }
+        },
+        {
+          "name": "Get Notification Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notifications/stats?startDate=2024-01-01&endDate=2024-12-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications", "stats"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-12-31"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Queue Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notifications/queue/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications", "queue", "stats"]
+            }
+          }
+        },
+        {
+          "name": "Get Notification Templates",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notifications/templates",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications", "templates"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notification Templates & Examples",
+      "item": [
+        {
+          "name": "📚 Exam Reminder Template",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Upcoming Exam: Mathematics\",\n  \"message\": \"Dear Students, you have an upcoming Mathematics exam on December 15th, 2024. Please prepare accordingly. Topics: Algebra, Geometry, Trigonometry.\",\n  \"type\": \"REMINDER\",\n  \"channels\": [\"IN_APP\", \"EMAIL\"],\n  \"targetType\": \"CLASS_WISE\",\n  \"targetClassIds\": [\"class-10-id\"],\n  \"scheduledAt\": \"2024-12-14T18:00:00Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"]
+            }
+          }
+        },
+        {
+          "name": "💰 Fee Due Reminder",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Fee Payment Due\",\n  \"message\": \"Dear Parent, the monthly fee payment for your child is due on December 31st, 2024. Amount: $500. Please make the payment to avoid late fees.\",\n  \"type\": \"FEE_DUE\",\n  \"channels\": [\"IN_APP\", \"EMAIL\", \"SMS\"],\n  \"targetType\": \"SPECIFIC_ROLES\",\n  \"targetRoles\": [\"PARENT\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"]
+            }
+          }
+        },
+        {
+          "name": "⚠️ Low Attendance Alert",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Low Attendance Alert\",\n  \"message\": \"Dear Parent, your child's attendance is below 75%. Current attendance: 68%. Please ensure regular attendance to meet academic requirements.\",\n  \"type\": \"ATTENDANCE_ALERT\",\n  \"channels\": [\"IN_APP\", \"EMAIL\", \"SMS\"],\n  \"targetType\": \"SPECIFIC_USERS\",\n  \"targetUserIds\": [\"parent-user-id\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"]
+            }
+          }
+        },
+        {
+          "name": "🎉 Exam Results Published",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Exam Results Available\",\n  \"message\": \"Dear Students, your Mid-term examination results are now available. Please check your dashboard to view your performance. Congratulations to all!\",\n  \"type\": \"EXAM_RESULT\",\n  \"channels\": [\"IN_APP\", \"EMAIL\", \"PUSH\"],\n  \"targetType\": \"CLASS_WISE\",\n  \"targetClassIds\": [\"class-10-id\", \"class-9-id\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"]
+            }
+          }
+        },
+        {
+          "name": "🏫 School Event Announcement",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Annual Sports Day 2024\",\n  \"message\": \"Join us for our Annual Sports Day on December 20th, 2024. Events start at 9 AM. Parents and students are invited to participate and cheer for their teams!\",\n  \"type\": \"EVENT\",\n  \"channels\": [\"IN_APP\", \"EMAIL\", \"SMS\", \"PUSH\"],\n  \"targetType\": \"ALL_USERS\",\n  \"scheduledAt\": \"2024-12-15T09:00:00Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"]
+            }
+          }
+        },
+        {
+          "name": "🏖️ Holiday Notice",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Winter Break Holiday\",\n  \"message\": \"School will be closed for Winter Break from December 25th to January 5th. Classes will resume on January 6th, 2025. Happy Holidays!\",\n  \"type\": \"HOLIDAY\",\n  \"channels\": [\"IN_APP\", \"EMAIL\"],\n  \"targetType\": \"ALL_USERS\",\n  \"scheduledAt\": \"2024-12-20T10:00:00Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Multi-Channel Testing",
+      "item": [
+        {
+          "name": "📱 In-App Only Notification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Quick Update\",\n  \"message\": \"This is a quick in-app notification that won't send emails or SMS.\",\n  \"type\": \"ANNOUNCEMENT\",\n  \"channels\": [\"IN_APP\"],\n  \"targetType\": \"SPECIFIC_USERS\",\n  \"targetUserIds\": [\"{{userId}}\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"]
+            }
+          }
+        },
+        {
+          "name": "📧 Email Only Notification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Detailed Report\",\n  \"message\": \"Please find the detailed monthly report attached. This notification is sent via email only for record keeping.\",\n  \"type\": \"ANNOUNCEMENT\",\n  \"channels\": [\"EMAIL\"],\n  \"targetType\": \"SPECIFIC_ROLES\",\n  \"targetRoles\": [\"SCHOOL_ADMIN\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"]
+            }
+          }
+        },
+        {
+          "name": "📱 SMS Only Notification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Urgent Alert\",\n  \"message\": \"School will close early today due to weather conditions. Please pick up your children by 2 PM.\",\n  \"type\": \"ALERT\",\n  \"channels\": [\"SMS\"],\n  \"targetType\": \"SPECIFIC_ROLES\",\n  \"targetRoles\": [\"PARENT\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"]
+            }
+          }
+        },
+        {
+          "name": "🔔 Push Only Notification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Mobile Alert\",\n  \"message\": \"New assignment posted in Mathematics. Check your mobile app for details.\",\n  \"type\": \"ALERT\",\n  \"channels\": [\"PUSH\"],\n  \"targetType\": \"SPECIFIC_ROLES\",\n  \"targetRoles\": [\"STUDENT\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"]
+            }
+          }
+        },
+        {
+          "name": "🌟 All Channels Notification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"🚨 Emergency Notification\",\n  \"message\": \"This is an emergency notification sent through all available channels to ensure maximum reach and immediate attention.\",\n  \"type\": \"ALERT\",\n  \"channels\": [\"IN_APP\", \"EMAIL\", \"SMS\", \"PUSH\"],\n  \"targetType\": \"ALL_USERS\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"]
+            }
+          }
+        }
+      ]
+    },
+    {
       "name": "Plan Comparison Examples",
       "item": [
         {
