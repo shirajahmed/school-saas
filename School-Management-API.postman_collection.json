@@ -1,0 +1,3371 @@
+{
+  "info": {
+    "name": "School Management API - Complete Flow",
+    "description": "Complete authentication and onboarding flow for School Management System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3001",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refreshToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "schoolId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "onboardingToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "setupToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Complete Onboarding Flow",
+      "item": [
+        {
+          "name": "1. School Registration",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"schoolName\": \"ABC International School\",\n  \"email\": \"admin@abcschool.com\",\n  \"phone\": \"+1234567890\",\n  \"password\": \"password123\",\n  \"address\": \"123 School Street, City\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Admin\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/school-signup",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "school-signup"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('schoolId', response.schoolId);",
+                  "    pm.collectionVariables.set('onboardingToken', response.onboardingToken);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "2. Get Onboarding Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/onboarding/status?token={{onboardingToken}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["onboarding", "status"],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{onboardingToken}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "3. Step 1 - Basic School Info",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"{{onboardingToken}}\",\n  \"step\": 1,\n  \"stepData\": {\n    \"schoolType\": \"HIGH_SCHOOL\",\n    \"language\": \"en\",\n    \"academicYearStart\": 4,\n    \"logo\": \"https://example.com/logo.png\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/onboarding/step",
+              "host": ["{{baseUrl}}"],
+              "path": ["onboarding", "step"]
+            }
+          }
+        },
+        {
+          "name": "4. Step 2 - Subscription Selection",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"{{onboardingToken}}\",\n  \"step\": 2,\n  \"stepData\": {\n    \"plan\": \"PROFESSIONAL\",\n    \"maxBranches\": 3,\n    \"features\": [\"attendance\", \"grades\", \"reports\", \"communication\"]\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/onboarding/step",
+              "host": ["{{baseUrl}}"],
+              "path": ["onboarding", "step"]
+            }
+          }
+        },
+        {
+          "name": "5. Step 3 - Payment Processing",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"{{onboardingToken}}\",\n  \"step\": 3,\n  \"stepData\": {\n    \"paymentMethod\": \"stripe\",\n    \"paymentToken\": \"tok_visa\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/onboarding/step",
+              "host": ["{{baseUrl}}"],
+              "path": ["onboarding", "step"]
+            }
+          }
+        },
+        {
+          "name": "6. Complete Onboarding",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"{{onboardingToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/onboarding/complete",
+              "host": ["{{baseUrl}}"],
+              "path": ["onboarding", "complete"]
+            }
+          }
+        },
+        {
+          "name": "7. Login to Dashboard",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identifier\": \"admin@abcschool.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('accessToken', response.accessToken);",
+                  "    pm.collectionVariables.set('refreshToken', response.refreshToken);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Onboarding Helper Endpoints",
+      "item": [
+        {
+          "name": "Get Subscription Plans",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/onboarding/plans",
+              "host": ["{{baseUrl}}"],
+              "path": ["onboarding", "plans"]
+            }
+          }
+        },
+        {
+          "name": "Get School Types",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/onboarding/school-types",
+              "host": ["{{baseUrl}}"],
+              "path": ["onboarding", "school-types"]
+            }
+          }
+        },
+        {
+          "name": "Get Languages",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/onboarding/languages",
+              "host": ["{{baseUrl}}"],
+              "path": ["onboarding", "languages"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "User Management Flow",
+      "item": [
+        {
+          "name": "Create Teacher",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Teacher\",\n  \"email\": \"jane.teacher@abcschool.com\",\n  \"phone\": \"+1234567891\",\n  \"role\": \"TEACHER\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/create-user",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "create-user"]
+            }
+          }
+        },
+        {
+          "name": "Create Student",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Alice\",\n  \"lastName\": \"Student\",\n  \"email\": \"alice.student@abcschool.com\",\n  \"phone\": \"+1234567892\",\n  \"role\": \"STUDENT\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/create-user",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "create-user"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Password Reset Flow",
+      "item": [
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@abcschool.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/forgot-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "forgot-password"]
+            }
+          }
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@abcschool.com\",\n  \"otp\": \"123456\",\n  \"newPassword\": \"newpassword456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/reset-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "reset-password"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin Permission Management",
+      "item": [
+        {
+          "name": "Master Admin Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identifier\": \"master@schoolsaas.com\",\n  \"password\": \"MasterAdmin@2024!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('accessToken', response.accessToken);",
+                  "    pm.collectionVariables.set('refreshToken', response.refreshToken);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Super Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"SuperAdmin\",\n  \"email\": \"john.superadmin@company.com\",\n  \"phone\": \"+1234567890\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/super-admin",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "super-admin"]
+            }
+          }
+        },
+        {
+          "name": "List All Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users"]
+            }
+          }
+        },
+        {
+          "name": "List Users by Role",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users?role=BRANCH_ADMIN",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users"],
+              "query": [
+                {
+                  "key": "role",
+                  "value": "BRANCH_ADMIN"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Assign Custom Permissions",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resource\": \"STUDENTS\",\n  \"actions\": [\"CREATE\", \"READ\", \"UPDATE\"],\n  \"conditions\": {\n    \"own_branch_only\": true\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/permissions/user-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "permissions", "user-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Get User Permissions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/permissions/user-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "permissions", "user-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Update User Role",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"SUB_BRANCH_ADMIN\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/user-id-here/role",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users", "user-id-here", "role"]
+            }
+          }
+        },
+        {
+          "name": "Deactivate User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/user-id-here/deactivate",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users", "user-id-here", "deactivate"]
+            }
+          }
+        },
+        {
+          "name": "Get System Analytics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/analytics",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "analytics"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Permission Examples",
+      "item": [
+        {
+          "name": "Give Branch Admin User Creation Rights",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resource\": \"USERS\",\n  \"actions\": [\"CREATE\", \"READ\"],\n  \"conditions\": {\n    \"own_branch_only\": true,\n    \"roles_allowed\": [\"TEACHER\", \"STUDENT\"]\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/permissions/branch-admin-id",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "permissions", "branch-admin-id"]
+            }
+          }
+        },
+        {
+          "name": "Give Teacher Report Access",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resource\": \"REPORTS\",\n  \"actions\": [\"READ\", \"CREATE\"],\n  \"conditions\": {\n    \"own_classes_only\": true\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/permissions/teacher-id",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "permissions", "teacher-id"]
+            }
+          }
+        },
+        {
+          "name": "Give Sub-Branch Admin Limited Access",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resource\": \"STUDENTS\",\n  \"actions\": [\"READ\", \"UPDATE\"],\n  \"conditions\": {\n    \"own_branch_only\": true\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/permissions/sub-branch-admin-id",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "permissions", "sub-branch-admin-id"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Subscription Management",
+      "item": [
+        {
+          "name": "Get School Subscription",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscription/school-subscription",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription", "school-subscription"]
+            }
+          }
+        },
+        {
+          "name": "Update Subscription Plan",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"newPlan\": \"PROFESSIONAL\",\n  \"paymentId\": \"pay_123456789\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscription/update-plan",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription", "update-plan"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Subscription Feature Tests",
+      "item": [
+        {
+          "name": "✅ Basic Attendance (All Plans)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentId\": \"student-123\",\n  \"date\": \"2024-11-30\",\n  \"status\": \"PRESENT\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscription-example/basic-attendance",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription-example", "basic-attendance"]
+            }
+          }
+        },
+        {
+          "name": "❌ Advanced Reports (Professional+ Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reportType\": \"advanced_analytics\",\n  \"dateRange\": \"last_month\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscription-example/advanced-reports",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription-example", "advanced-reports"]
+            }
+          }
+        },
+        {
+          "name": "❌ Send SMS (Professional+ Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Your child was absent today\",\n  \"recipients\": [\"parent1\", \"parent2\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscription-example/send-sms",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription-example", "send-sms"]
+            }
+          }
+        },
+        {
+          "name": "❌ Multi-Branch Management (Enterprise+ Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"transfer_student\",\n  \"fromBranch\": \"branch-1\",\n  \"toBranch\": \"branch-2\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscription-example/manage-branches",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription-example", "manage-branches"]
+            }
+          }
+        },
+        {
+          "name": "❌ API Access (Enterprise+ Only)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscription-example/api-data",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription-example", "api-data"]
+            }
+          }
+        },
+        {
+          "name": "❌ White Label Branding (Enterprise+ Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"logo\": \"https://school.com/logo.png\",\n  \"primaryColor\": \"#007bff\",\n  \"companyName\": \"ABC School\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscription-example/customize-branding",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription-example", "customize-branding"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Subscription Limit Tests",
+      "item": [
+        {
+          "name": "🔢 Create Branch (Check Limit)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"North Branch\",\n  \"address\": \"123 North Street\",\n  \"phone\": \"+1234567890\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscription-example/create-branch",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription-example", "create-branch"]
+            }
+          }
+        },
+        {
+          "name": "🔢 Add Student (Check Limit)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Student\",\n  \"email\": \"john.student@school.com\",\n  \"rollNumber\": \"2024001\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscription-example/add-student",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription-example", "add-student"]
+            }
+          }
+        },
+        {
+          "name": "🔢 Add Teacher (Check Limit)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Teacher\",\n  \"email\": \"jane.teacher@school.com\",\n  \"subject\": \"Mathematics\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscription-example/add-teacher",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription-example", "add-teacher"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Student Management",
+      "item": [
+        {
+          "name": "Get All Students",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/students",
+              "host": ["{{baseUrl}}"],
+              "path": ["students"]
+            }
+          }
+        },
+        {
+          "name": "Search Students",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/students?search=john&branchId=branch-123&classId=class-456",
+              "host": ["{{baseUrl}}"],
+              "path": ["students"],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "john"
+                },
+                {
+                  "key": "branchId",
+                  "value": "branch-123"
+                },
+                {
+                  "key": "classId",
+                  "value": "class-456"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Student by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/students/student-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["students", "student-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Create Student",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Student\",\n  \"email\": \"john.student@school.com\",\n  \"phone\": \"+1234567890\",\n  \"branchId\": \"branch-123\",\n  \"rollNumber\": \"2024001\",\n  \"admissionNo\": \"ADM001\",\n  \"dateOfBirth\": \"2010-05-15\",\n  \"gender\": \"Male\",\n  \"address\": \"123 Student Street\",\n  \"parentPhone\": \"+1987654321\",\n  \"parentEmail\": \"parent@email.com\",\n  \"classId\": \"class-456\",\n  \"sectionId\": \"section-789\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/students",
+              "host": ["{{baseUrl}}"],
+              "path": ["students"]
+            }
+          }
+        },
+        {
+          "name": "Update Student",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"John Updated\",\n  \"lastName\": \"Student\",\n  \"email\": \"john.updated@school.com\",\n  \"phone\": \"+1234567890\",\n  \"rollNumber\": \"2024001\",\n  \"classId\": \"new-class-id\",\n  \"address\": \"456 New Address\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/students/student-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["students", "student-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Delete Student",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/students/student-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["students", "student-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Get Student Attendance",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/students/student-id-here/attendance?startDate=2024-01-01&endDate=2024-12-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["students", "student-id-here", "attendance"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-12-31"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Student Results",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/students/student-id-here/results",
+              "host": ["{{baseUrl}}"],
+              "path": ["students", "student-id-here", "results"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Teacher Management",
+      "item": [
+        {
+          "name": "Get All Teachers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teachers",
+              "host": ["{{baseUrl}}"],
+              "path": ["teachers"]
+            }
+          }
+        },
+        {
+          "name": "Search Teachers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teachers?search=math&subject=Mathematics&departmentId=dept-123",
+              "host": ["{{baseUrl}}"],
+              "path": ["teachers"],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "math"
+                },
+                {
+                  "key": "subject",
+                  "value": "Mathematics"
+                },
+                {
+                  "key": "departmentId",
+                  "value": "dept-123"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Teacher by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teachers/teacher-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["teachers", "teacher-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Create Teacher",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Teacher\",\n  \"email\": \"jane.teacher@school.com\",\n  \"phone\": \"+1234567890\",\n  \"branchId\": \"branch-123\",\n  \"departmentId\": \"dept-456\",\n  \"employeeId\": \"EMP001\",\n  \"subject\": \"Mathematics\",\n  \"qualification\": \"M.Sc Mathematics\",\n  \"experience\": 5,\n  \"salary\": 50000,\n  \"joinDate\": \"2024-01-15\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/teachers",
+              "host": ["{{baseUrl}}"],
+              "path": ["teachers"]
+            }
+          }
+        },
+        {
+          "name": "Update Teacher",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Jane Updated\",\n  \"subject\": \"Advanced Mathematics\",\n  \"qualification\": \"Ph.D Mathematics\",\n  \"experience\": 7,\n  \"salary\": 60000\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/teachers/teacher-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["teachers", "teacher-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Delete Teacher",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teachers/teacher-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["teachers", "teacher-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Get Teacher Classes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teachers/teacher-id-here/classes",
+              "host": ["{{baseUrl}}"],
+              "path": ["teachers", "teacher-id-here", "classes"]
+            }
+          }
+        },
+        {
+          "name": "Assign Teacher to Class",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"classId\": \"class-123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/teachers/teacher-id-here/assign-class",
+              "host": ["{{baseUrl}}"],
+              "path": ["teachers", "teacher-id-here", "assign-class"]
+            }
+          }
+        },
+        {
+          "name": "Get Teacher Schedule",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teachers/teacher-id-here/schedule",
+              "host": ["{{baseUrl}}"],
+              "path": ["teachers", "teacher-id-here", "schedule"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Class Management",
+      "item": [
+        {
+          "name": "Get All Classes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/classes",
+              "host": ["{{baseUrl}}"],
+              "path": ["classes"]
+            }
+          }
+        },
+        {
+          "name": "Search Classes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/classes?grade=10&branchId=branch-123&departmentId=dept-456",
+              "host": ["{{baseUrl}}"],
+              "path": ["classes"],
+              "query": [
+                {
+                  "key": "grade",
+                  "value": "10"
+                },
+                {
+                  "key": "branchId",
+                  "value": "branch-123"
+                },
+                {
+                  "key": "departmentId",
+                  "value": "dept-456"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Class by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/classes/class-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["classes", "class-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Create Class",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Grade 10 A\",\n  \"grade\": 10,\n  \"branchId\": \"branch-123\",\n  \"departmentId\": \"dept-456\",\n  \"teacherId\": \"teacher-789\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/classes",
+              "host": ["{{baseUrl}}"],
+              "path": ["classes"]
+            }
+          }
+        },
+        {
+          "name": "Update Class",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Grade 10 A Updated\",\n  \"teacherId\": \"new-teacher-id\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/classes/class-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["classes", "class-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Delete Class",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/classes/class-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["classes", "class-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Get Class Students",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/classes/class-id-here/students",
+              "host": ["{{baseUrl}}"],
+              "path": ["classes", "class-id-here", "students"]
+            }
+          }
+        },
+        {
+          "name": "Add Student to Class",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentId\": \"student-123\",\n  \"sectionId\": \"section-456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/classes/class-id-here/add-student",
+              "host": ["{{baseUrl}}"],
+              "path": ["classes", "class-id-here", "add-student"]
+            }
+          }
+        },
+        {
+          "name": "Remove Student from Class",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/classes/class-id-here/remove-student/student-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["classes", "class-id-here", "remove-student", "student-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Get Class Attendance Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/classes/class-id-here/attendance-summary?startDate=2024-01-01&endDate=2024-12-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["classes", "class-id-here", "attendance-summary"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-12-31"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Section for Class",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Section A\",\n  \"capacity\": 30,\n  \"teacherId\": \"teacher-123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/classes/class-id-here/sections",
+              "host": ["{{baseUrl}}"],
+              "path": ["classes", "class-id-here", "sections"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Department Management (Colleges)",
+      "item": [
+        {
+          "name": "Get All Departments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/departments",
+              "host": ["{{baseUrl}}"],
+              "path": ["departments"]
+            }
+          }
+        },
+        {
+          "name": "Search Departments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/departments?search=computer&branchId=branch-123",
+              "host": ["{{baseUrl}}"],
+              "path": ["departments"],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "computer"
+                },
+                {
+                  "key": "branchId",
+                  "value": "branch-123"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Department by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/departments/dept-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["departments", "dept-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Create Department (Enterprise+ Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Computer Science\",\n  \"code\": \"CS\",\n  \"branchId\": \"branch-123\",\n  \"head\": \"Dr. John Smith\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/departments",
+              "host": ["{{baseUrl}}"],
+              "path": ["departments"]
+            }
+          }
+        },
+        {
+          "name": "Update Department",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Computer Science & Engineering\",\n  \"head\": \"Dr. Jane Doe\",\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/departments/dept-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["departments", "dept-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Delete Department",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/departments/dept-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["departments", "dept-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Get Department Teachers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/departments/dept-id-here/teachers",
+              "host": ["{{baseUrl}}"],
+              "path": ["departments", "dept-id-here", "teachers"]
+            }
+          }
+        },
+        {
+          "name": "Get Department Classes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/departments/dept-id-here/classes",
+              "host": ["{{baseUrl}}"],
+              "path": ["departments", "dept-id-here", "classes"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Section Management",
+      "item": [
+        {
+          "name": "Get All Sections",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sections",
+              "host": ["{{baseUrl}}"],
+              "path": ["sections"]
+            }
+          }
+        },
+        {
+          "name": "Search Sections",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sections?classId=class-123&branchId=branch-456&search=A",
+              "host": ["{{baseUrl}}"],
+              "path": ["sections"],
+              "query": [
+                {
+                  "key": "classId",
+                  "value": "class-123"
+                },
+                {
+                  "key": "branchId",
+                  "value": "branch-456"
+                },
+                {
+                  "key": "search",
+                  "value": "A"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Section by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sections/section-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["sections", "section-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Create Section",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Section A\",\n  \"branchId\": \"branch-123\",\n  \"classId\": \"class-456\",\n  \"capacity\": 30,\n  \"teacherId\": \"teacher-789\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/sections",
+              "host": ["{{baseUrl}}"],
+              "path": ["sections"]
+            }
+          }
+        },
+        {
+          "name": "Update Section",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Section A Updated\",\n  \"capacity\": 35,\n  \"teacherId\": \"new-teacher-id\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/sections/section-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["sections", "section-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Delete Section",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sections/section-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["sections", "section-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Get Section Students",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sections/section-id-here/students",
+              "host": ["{{baseUrl}}"],
+              "path": ["sections", "section-id-here", "students"]
+            }
+          }
+        },
+        {
+          "name": "Assign Students to Section",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentIds\": [\"student-1\", \"student-2\", \"student-3\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/sections/section-id-here/assign-students",
+              "host": ["{{baseUrl}}"],
+              "path": ["sections", "section-id-here", "assign-students"]
+            }
+          }
+        },
+        {
+          "name": "Remove Student from Section",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sections/section-id-here/remove-student/student-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["sections", "section-id-here", "remove-student", "student-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Get Section Attendance Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sections/section-id-here/attendance-summary?startDate=2024-01-01&endDate=2024-12-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["sections", "section-id-here", "attendance-summary"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-12-31"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Exam Management",
+      "item": [
+        {
+          "name": "Get All Exams",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/exams",
+              "host": ["{{baseUrl}}"],
+              "path": ["exams"]
+            }
+          }
+        },
+        {
+          "name": "Search Exams",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/exams?classId=class-123&subject=Mathematics&type=MIDTERM&startDate=2024-01-01&endDate=2024-12-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["exams"],
+              "query": [
+                {
+                  "key": "classId",
+                  "value": "class-123"
+                },
+                {
+                  "key": "subject",
+                  "value": "Mathematics"
+                },
+                {
+                  "key": "type",
+                  "value": "MIDTERM"
+                },
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-12-31"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Exam by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/exams/exam-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["exams", "exam-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Create Exam (Professional+ Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Mathematics Midterm\",\n  \"type\": \"MIDTERM\",\n  \"subject\": \"Mathematics\",\n  \"branchId\": \"branch-123\",\n  \"classId\": \"class-456\",\n  \"totalMarks\": 100,\n  \"passingMarks\": 40,\n  \"examDate\": \"2024-03-15T09:00:00Z\",\n  \"duration\": 180,\n  \"teacherId\": \"teacher-789\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/exams",
+              "host": ["{{baseUrl}}"],
+              "path": ["exams"]
+            }
+          }
+        },
+        {
+          "name": "Update Exam",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Mathematics Midterm Updated\",\n  \"examDate\": \"2024-03-20T09:00:00Z\",\n  \"duration\": 120\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/exams/exam-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["exams", "exam-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Delete Exam",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/exams/exam-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["exams", "exam-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Get Exam Results",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/exams/exam-id-here/results",
+              "host": ["{{baseUrl}}"],
+              "path": ["exams", "exam-id-here", "results"]
+            }
+          }
+        },
+        {
+          "name": "Get Exam Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/exams/exam-id-here/statistics",
+              "host": ["{{baseUrl}}"],
+              "path": ["exams", "exam-id-here", "statistics"]
+            }
+          }
+        },
+        {
+          "name": "Generate Result Sheet",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/exams/exam-id-here/result-sheet",
+              "host": ["{{baseUrl}}"],
+              "path": ["exams", "exam-id-here", "result-sheet"]
+            }
+          }
+        },
+        {
+          "name": "Publish Exam Results",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/exams/exam-id-here/publish",
+              "host": ["{{baseUrl}}"],
+              "path": ["exams", "exam-id-here", "publish"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Results Management",
+      "item": [
+        {
+          "name": "Get All Results",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/results",
+              "host": ["{{baseUrl}}"],
+              "path": ["results"]
+            }
+          }
+        },
+        {
+          "name": "Filter Results",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/results?examId=exam-123&studentId=student-456&minMarks=50&maxMarks=100",
+              "host": ["{{baseUrl}}"],
+              "path": ["results"],
+              "query": [
+                {
+                  "key": "examId",
+                  "value": "exam-123"
+                },
+                {
+                  "key": "studentId",
+                  "value": "student-456"
+                },
+                {
+                  "key": "minMarks",
+                  "value": "50"
+                },
+                {
+                  "key": "maxMarks",
+                  "value": "100"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Result by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/results/result-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["results", "result-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Create Single Result",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"examId\": \"exam-123\",\n  \"studentId\": \"student-456\",\n  \"branchId\": \"branch-789\",\n  \"marksObtained\": 85,\n  \"remarks\": \"Good performance\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/results",
+              "host": ["{{baseUrl}}"],
+              "path": ["results"]
+            }
+          }
+        },
+        {
+          "name": "Create Bulk Results",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"examId\": \"exam-123\",\n  \"results\": [\n    {\n      \"studentId\": \"student-1\",\n      \"branchId\": \"branch-789\",\n      \"marksObtained\": 85,\n      \"remarks\": \"Excellent\"\n    },\n    {\n      \"studentId\": \"student-2\",\n      \"branchId\": \"branch-789\",\n      \"marksObtained\": 72,\n      \"remarks\": \"Good\"\n    },\n    {\n      \"studentId\": \"student-3\",\n      \"branchId\": \"branch-789\",\n      \"marksObtained\": 45,\n      \"remarks\": \"Needs improvement\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/results/bulk",
+              "host": ["{{baseUrl}}"],
+              "path": ["results", "bulk"]
+            }
+          }
+        },
+        {
+          "name": "Update Result",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"marksObtained\": 90,\n  \"remarks\": \"Excellent performance after review\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/results/result-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["results", "result-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Delete Result",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/results/result-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["results", "result-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Get Student All Results",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/results/student/student-id-here?subject=Mathematics&examType=MIDTERM",
+              "host": ["{{baseUrl}}"],
+              "path": ["results", "student", "student-id-here"],
+              "query": [
+                {
+                  "key": "subject",
+                  "value": "Mathematics"
+                },
+                {
+                  "key": "examType",
+                  "value": "MIDTERM"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Class Performance",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/results/class/class-id-here/performance?subject=Mathematics",
+              "host": ["{{baseUrl}}"],
+              "path": ["results", "class", "class-id-here", "performance"],
+              "query": [
+                {
+                  "key": "subject",
+                  "value": "Mathematics"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Attendance Management",
+      "item": [
+        {
+          "name": "Get All Attendance",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/attendance",
+              "host": ["{{baseUrl}}"],
+              "path": ["attendance"]
+            }
+          }
+        },
+        {
+          "name": "Filter Attendance",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/attendance?sectionId=section-123&date=2024-03-15&status=PRESENT&startDate=2024-01-01&endDate=2024-12-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["attendance"],
+              "query": [
+                {
+                  "key": "sectionId",
+                  "value": "section-123"
+                },
+                {
+                  "key": "date",
+                  "value": "2024-03-15"
+                },
+                {
+                  "key": "status",
+                  "value": "PRESENT"
+                },
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-12-31"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Attendance by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/attendance/attendance-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["attendance", "attendance-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Mark Single Attendance",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentId\": \"student-123\",\n  \"sectionId\": \"section-456\",\n  \"branchId\": \"branch-789\",\n  \"date\": \"2024-03-15\",\n  \"status\": \"PRESENT\",\n  \"remarks\": \"On time\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/attendance",
+              "host": ["{{baseUrl}}"],
+              "path": ["attendance"]
+            }
+          }
+        },
+        {
+          "name": "Mark Bulk Attendance (Entire Section)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2024-03-15\",\n  \"sectionId\": \"section-456\",\n  \"branchId\": \"branch-789\",\n  \"attendanceList\": [\n    {\n      \"studentId\": \"student-1\",\n      \"status\": \"PRESENT\",\n      \"remarks\": \"On time\"\n    },\n    {\n      \"studentId\": \"student-2\",\n      \"status\": \"ABSENT\",\n      \"remarks\": \"Sick leave\"\n    },\n    {\n      \"studentId\": \"student-3\",\n      \"status\": \"LATE\",\n      \"remarks\": \"Arrived 15 minutes late\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/attendance/bulk",
+              "host": ["{{baseUrl}}"],
+              "path": ["attendance", "bulk"]
+            }
+          }
+        },
+        {
+          "name": "Update Attendance",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"PRESENT\",\n  \"remarks\": \"Corrected - was actually present\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/attendance/attendance-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["attendance", "attendance-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Delete Attendance",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/attendance/attendance-id-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["attendance", "attendance-id-here"]
+            }
+          }
+        },
+        {
+          "name": "Get Section Attendance for Date",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/attendance/section/section-id-here/date/2024-03-15",
+              "host": ["{{baseUrl}}"],
+              "path": ["attendance", "section", "section-id-here", "date", "2024-03-15"]
+            }
+          }
+        },
+        {
+          "name": "Get Student Attendance Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/attendance/student/student-id-here/summary?startDate=2024-01-01&endDate=2024-12-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["attendance", "student", "student-id-here", "summary"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-12-31"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Class Attendance Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/attendance/class/class-id-here/summary?startDate=2024-01-01&endDate=2024-12-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["attendance", "class", "class-id-here", "summary"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-12-31"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Daily Attendance Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/attendance/daily-report/2024-03-15?branchId=branch-123&sectionId=section-456",
+              "host": ["{{baseUrl}}"],
+              "path": ["attendance", "daily-report", "2024-03-15"],
+              "query": [
+                {
+                  "key": "branchId",
+                  "value": "branch-123"
+                },
+                {
+                  "key": "sectionId",
+                  "value": "section-456"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notification System",
+      "item": [
+        {
+          "name": "Create Basic Notification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Important Announcement\",\n  \"message\": \"This is a test notification for all users in the school.\",\n  \"type\": \"ANNOUNCEMENT\",\n  \"channels\": [\"IN_APP\", \"EMAIL\"],\n  \"targetType\": \"ALL_USERS\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"]
+            }
+          }
+        },
+        {
+          "name": "Create Role-Based Notification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Teacher Meeting Reminder\",\n  \"message\": \"Monthly teacher meeting scheduled for tomorrow at 3 PM in the conference room.\",\n  \"type\": \"REMINDER\",\n  \"channels\": [\"IN_APP\", \"EMAIL\", \"SMS\"],\n  \"targetType\": \"SPECIFIC_ROLES\",\n  \"targetRoles\": [\"TEACHER\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"]
+            }
+          }
+        },
+        {
+          "name": "Create Class-Specific Notification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Class 10 Exam Schedule\",\n  \"message\": \"Mathematics exam has been rescheduled to next Monday. Please prepare accordingly.\",\n  \"type\": \"ALERT\",\n  \"channels\": [\"IN_APP\", \"EMAIL\", \"SMS\"],\n  \"targetType\": \"CLASS_WISE\",\n  \"targetClassIds\": [\"class-10-id\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"]
+            }
+          }
+        },
+        {
+          "name": "Create Filtered Notification (Parents of Class 5)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Parent-Teacher Meeting\",\n  \"message\": \"Parent-teacher meeting for Class 5 students scheduled for this Saturday at 10 AM.\",\n  \"type\": \"EVENT\",\n  \"channels\": [\"IN_APP\", \"EMAIL\", \"SMS\"],\n  \"targetType\": \"CLASS_WISE\",\n  \"targetClassIds\": [\"class-5-id\"],\n  \"filters\": {\n    \"parentsOfClass\": \"class-5-id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"]
+            }
+          }
+        },
+        {
+          "name": "Create Scheduled Notification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Exam Reminder\",\n  \"message\": \"Your Mathematics exam is tomorrow. Good luck!\",\n  \"type\": \"REMINDER\",\n  \"channels\": [\"IN_APP\", \"EMAIL\"],\n  \"targetType\": \"SPECIFIC_ROLES\",\n  \"targetRoles\": [\"STUDENT\"],\n  \"scheduledAt\": \"2024-12-01T08:00:00Z\",\n  \"expiresAt\": \"2024-12-01T18:00:00Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"]
+            }
+          }
+        },
+        {
+          "name": "Create Branch-Specific Notification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Branch Holiday Notice\",\n  \"message\": \"Main branch will be closed tomorrow due to maintenance work.\",\n  \"type\": \"ALERT\",\n  \"channels\": [\"IN_APP\", \"EMAIL\", \"SMS\"],\n  \"targetType\": \"BRANCH_WISE\",\n  \"targetBranchIds\": [\"main-branch-id\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"]
+            }
+          }
+        },
+        {
+          "name": "Create Section-Specific Notification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Section A Field Trip\",\n  \"message\": \"Section A students, don't forget to bring your permission slips for tomorrow's field trip.\",\n  \"type\": \"REMINDER\",\n  \"channels\": [\"IN_APP\", \"EMAIL\"],\n  \"targetType\": \"SECTION_WISE\",\n  \"targetSectionIds\": [\"section-a-id\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"]
+            }
+          }
+        },
+        {
+          "name": "Get My Notifications",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notifications/my-notifications?limit=20&offset=0",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications", "my-notifications"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "offset",
+                  "value": "0"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Mark Notification as Read",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notifications/delivery-id-here/read",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications", "delivery-id-here", "read"]
+            }
+          }
+        },
+        {
+          "name": "Send Test Notification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Test Notification\",\n  \"message\": \"This is a test notification to verify the system is working correctly.\",\n  \"channels\": [\"IN_APP\", \"EMAIL\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications/test",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications", "test"]
+            }
+          }
+        },
+        {
+          "name": "Broadcast School Announcement",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"🎉 School Achievement\",\n  \"message\": \"Congratulations! Our school has won the inter-school science competition. Well done to all participants!\",\n  \"channels\": [\"IN_APP\", \"EMAIL\", \"SMS\", \"PUSH\"],\n  \"targetType\": \"ALL_USERS\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications/broadcast",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications", "broadcast"]
+            }
+          }
+        },
+        {
+          "name": "Get Notification Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notifications/stats?startDate=2024-01-01&endDate=2024-12-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications", "stats"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-12-31"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Queue Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notifications/queue/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications", "queue", "stats"]
+            }
+          }
+        },
+        {
+          "name": "Get Notification Templates",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notifications/templates",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications", "templates"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notification Templates & Examples",
+      "item": [
+        {
+          "name": "📚 Exam Reminder Template",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Upcoming Exam: Mathematics\",\n  \"message\": \"Dear Students, you have an upcoming Mathematics exam on December 15th, 2024. Please prepare accordingly. Topics: Algebra, Geometry, Trigonometry.\",\n  \"type\": \"REMINDER\",\n  \"channels\": [\"IN_APP\", \"EMAIL\"],\n  \"targetType\": \"CLASS_WISE\",\n  \"targetClassIds\": [\"class-10-id\"],\n  \"scheduledAt\": \"2024-12-14T18:00:00Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"]
+            }
+          }
+        },
+        {
+          "name": "💰 Fee Due Reminder",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Fee Payment Due\",\n  \"message\": \"Dear Parent, the monthly fee payment for your child is due on December 31st, 2024. Amount: $500. Please make the payment to avoid late fees.\",\n  \"type\": \"FEE_DUE\",\n  \"channels\": [\"IN_APP\", \"EMAIL\", \"SMS\"],\n  \"targetType\": \"SPECIFIC_ROLES\",\n  \"targetRoles\": [\"PARENT\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"]
+            }
+          }
+        },
+        {
+          "name": "⚠️ Low Attendance Alert",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Low Attendance Alert\",\n  \"message\": \"Dear Parent, your child's attendance is below 75%. Current attendance: 68%. Please ensure regular attendance to meet academic requirements.\",\n  \"type\": \"ATTENDANCE_ALERT\",\n  \"channels\": [\"IN_APP\", \"EMAIL\", \"SMS\"],\n  \"targetType\": \"SPECIFIC_USERS\",\n  \"targetUserIds\": [\"parent-user-id\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"]
+            }
+          }
+        },
+        {
+          "name": "🎉 Exam Results Published",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Exam Results Available\",\n  \"message\": \"Dear Students, your Mid-term examination results are now available. Please check your dashboard to view your performance. Congratulations to all!\",\n  \"type\": \"EXAM_RESULT\",\n  \"channels\": [\"IN_APP\", \"EMAIL\", \"PUSH\"],\n  \"targetType\": \"CLASS_WISE\",\n  \"targetClassIds\": [\"class-10-id\", \"class-9-id\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"]
+            }
+          }
+        },
+        {
+          "name": "🏫 School Event Announcement",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Annual Sports Day 2024\",\n  \"message\": \"Join us for our Annual Sports Day on December 20th, 2024. Events start at 9 AM. Parents and students are invited to participate and cheer for their teams!\",\n  \"type\": \"EVENT\",\n  \"channels\": [\"IN_APP\", \"EMAIL\", \"SMS\", \"PUSH\"],\n  \"targetType\": \"ALL_USERS\",\n  \"scheduledAt\": \"2024-12-15T09:00:00Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"]
+            }
+          }
+        },
+        {
+          "name": "🏖️ Holiday Notice",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Winter Break Holiday\",\n  \"message\": \"School will be closed for Winter Break from December 25th to January 5th. Classes will resume on January 6th, 2025. Happy Holidays!\",\n  \"type\": \"HOLIDAY\",\n  \"channels\": [\"IN_APP\", \"EMAIL\"],\n  \"targetType\": \"ALL_USERS\",\n  \"scheduledAt\": \"2024-12-20T10:00:00Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Multi-Channel Testing",
+      "item": [
+        {
+          "name": "📱 In-App Only Notification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Quick Update\",\n  \"message\": \"This is a quick in-app notification that won't send emails or SMS.\",\n  \"type\": \"ANNOUNCEMENT\",\n  \"channels\": [\"IN_APP\"],\n  \"targetType\": \"SPECIFIC_USERS\",\n  \"targetUserIds\": [\"{{userId}}\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"]
+            }
+          }
+        },
+        {
+          "name": "📧 Email Only Notification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Detailed Report\",\n  \"message\": \"Please find the detailed monthly report attached. This notification is sent via email only for record keeping.\",\n  \"type\": \"ANNOUNCEMENT\",\n  \"channels\": [\"EMAIL\"],\n  \"targetType\": \"SPECIFIC_ROLES\",\n  \"targetRoles\": [\"SCHOOL_ADMIN\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"]
+            }
+          }
+        },
+        {
+          "name": "📱 SMS Only Notification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Urgent Alert\",\n  \"message\": \"School will close early today due to weather conditions. Please pick up your children by 2 PM.\",\n  \"type\": \"ALERT\",\n  \"channels\": [\"SMS\"],\n  \"targetType\": \"SPECIFIC_ROLES\",\n  \"targetRoles\": [\"PARENT\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"]
+            }
+          }
+        },
+        {
+          "name": "🔔 Push Only Notification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Mobile Alert\",\n  \"message\": \"New assignment posted in Mathematics. Check your mobile app for details.\",\n  \"type\": \"ALERT\",\n  \"channels\": [\"PUSH\"],\n  \"targetType\": \"SPECIFIC_ROLES\",\n  \"targetRoles\": [\"STUDENT\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"]
+            }
+          }
+        },
+        {
+          "name": "🌟 All Channels Notification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"🚨 Emergency Notification\",\n  \"message\": \"This is an emergency notification sent through all available channels to ensure maximum reach and immediate attention.\",\n  \"type\": \"ALERT\",\n  \"channels\": [\"IN_APP\", \"EMAIL\", \"SMS\", \"PUSH\"],\n  \"targetType\": \"ALL_USERS\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Plan Comparison Examples",
+      "item": [
+        {
+          "name": "STARTER Plan Limits",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/onboarding/plans",
+              "host": ["{{baseUrl}}"],
+              "path": ["onboarding", "plans"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// STARTER Plan:",
+                  "// - Max 1 Branch",
+                  "// - Max 100 Students", 
+                  "// - Max 10 Teachers",
+                  "// - Basic features only",
+                  "",
+                  "pm.test('Shows STARTER plan limits', function () {",
+                  "    const response = pm.response.json();",
+                  "    const starter = response.plans.find(p => p.id === 'STARTER');",
+                  "    pm.expect(starter.maxBranches).to.eql(1);",
+                  "    pm.expect(starter.maxStudents).to.eql(100);",
+                  "    pm.expect(starter.maxTeachers).to.eql(10);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Test Feature Access by Plan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"note\": \"This request will show different responses based on your subscription plan:\",\n  \"examples\": {\n    \"STARTER\": \"❌ Feature not available in your plan\",\n    \"PROFESSIONAL\": \"✅ Advanced report generated\",\n    \"ENTERPRISE\": \"✅ Advanced report generated\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscription-example/advanced-reports",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription-example", "advanced-reports"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Permission Templates",
+      "item": [
+        {
+          "name": "Get Permission Templates",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/permission-templates",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "permission-templates"]
+            }
+          }
+        },
+        {
+          "name": "Create Permission Template",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Teacher Full Access\",\n  \"description\": \"Full access to teaching resources\",\n  \"role\": \"TEACHER\",\n  \"resource\": \"STUDENTS\",\n  \"actions\": [\"READ\", \"UPDATE\"],\n  \"conditions\": {\n    \"own_classes_only\": true\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/permission-templates",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "permission-templates"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "health"]
+        }
+      }
+    }
+  ]
+}

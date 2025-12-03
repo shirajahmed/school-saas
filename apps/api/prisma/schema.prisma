@@ -8,60 +8,648 @@ datasource db {
 }
 
 enum UserRole {
-  SUPER_ADMIN
-  SCHOOL_ADMIN
-  BRANCH_ADMIN
+  MASTER_SUPER_ADMIN  // Ultimate control - only you
+  SUPER_ADMIN         // Platform level admin
+  SCHOOL_ADMIN        // School level admin
+  BRANCH_ADMIN        // Branch level admin
+  SUB_BRANCH_ADMIN    // Sub branch admin
   TEACHER
   STUDENT
   PARENT
 }
 
-model School {
-  id        String   @id @default(cuid())
-  name      String
-  email     String   @unique
-  phone     String?
-  address   String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+enum PermissionAction {
+  CREATE
+  READ
+  UPDATE
+  DELETE
+  MANAGE
+  VIEW_ONLY
+}
 
-  branches Branch[]
-  users    User[]
+enum PermissionResource {
+  USERS
+  SCHOOLS
+  BRANCHES
+  STUDENTS
+  TEACHERS
+  PARENTS
+  CLASSES
+  ATTENDANCE
+  EXAMS
+  REPORTS
+  SETTINGS
+  SUBSCRIPTIONS
+  PAYMENTS
+  ANALYTICS
+}
+
+enum UserStatus {
+  PENDING     // Created but not activated
+  ACTIVE      // Completed onboarding
+  SUSPENDED   // Temporarily disabled
+  INACTIVE    // Permanently disabled
+}
+
+enum OtpType {
+  PASSWORD_RESET
+  EMAIL_VERIFICATION
+  ACCOUNT_SETUP
+}
+
+enum SchoolType {
+  PRIMARY
+  HIGH_SCHOOL
+  COLLEGE
+  UNIVERSITY
+  MIXED
+}
+
+enum OnboardingStatus {
+  PENDING
+  BASIC_INFO
+  SUBSCRIPTION
+  PAYMENT
+  SETUP
+  COMPLETED
+}
+
+enum SubscriptionPlan {
+  STARTER
+  PROFESSIONAL
+  ENTERPRISE
+  CUSTOM
+}
+
+enum SubscriptionStatus {
+  TRIAL
+  ACTIVE
+  EXPIRED
+  CANCELLED
+}
+
+model School {
+  id              String            @id @default(uuid())
+  name            String
+  email           String            @unique
+  phone           String?
+  address         String?
+  logo            String?           // URL to uploaded logo
+  schoolType      SchoolType?
+  language        String?           @default("en")
+  academicYearStart Int?            // Month (1-12)
+  maxBranches     Int               @default(1)
+  isActive        Boolean           @default(true)
+  onboarded       Boolean           @default(false)
+  onboardingStatus OnboardingStatus @default(PENDING)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  branches        Branch[]
+  users           User[]
+  students        Student[]
+  teachers        Teacher[]
+  classes         Class[]
+  exams           Exam[]
+  departments     Department[]    // For colleges
+  onboardingData  OnboardingData?
+  subscription    Subscription?
+  notifications   Notification[]
+  events          Event[]
+  holidays        Holiday[]
+  auditLogs       AuditLog[]
 
   @@map("schools")
 }
 
+model OnboardingData {
+  id              String   @id @default(uuid())
+  schoolId        String   @unique
+  currentStep     Int      @default(1)
+  stepData        Json     @default("{}")
+  completedSteps  Int[]    @default([])
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@map("onboarding_data")
+}
+
+model Subscription {
+  id              String             @id @default(uuid())
+  schoolId        String             @unique
+  plan            SubscriptionPlan
+  status          SubscriptionStatus @default(TRIAL)
+  maxBranches     Int                @default(1)
+  maxStudents     Int                @default(100)
+  maxTeachers     Int                @default(10)
+  features        String[]           @default([])
+  startDate       DateTime           @default(now())
+  endDate         DateTime?
+  trialEndDate    DateTime?
+  paymentId       String?
+  amount          Decimal?
+  currency        String?            @default("USD")
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@map("subscriptions")
+}
+
 model Branch {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid())
+  schoolId  String
   name      String
   address   String?
   phone     String?
-  schoolId  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  users  User[]
-
-  @@map("branches")
-}
-
-model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
-  firstName String
-  lastName  String
-  phone     String?
-  role      UserRole
-  schoolId  String
-  branchId  String?
+  email     String?
+  isDefault Boolean  @default(false)
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  school School  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  branch Branch? @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  school       School       @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  users        User[]
+  students     Student[]
+  teachers     Teacher[]
+  classes      Class[]
+  sections     Section[]
+  departments  Department[] // For colleges
+  attendance   Attendance[]
+  exams        Exam[]
+  results      Result[]
+  notifications Notification[]
+  events       Event[]
+  holidays     Holiday[]
+
+  @@map("branches")
+}
+
+model Department {
+  id        String   @id @default(uuid())
+  schoolId  String
+  branchId  String?  // Optional - for multi-branch colleges
+  name      String   // Computer Science, Mathematics, etc.
+  code      String   // CS, MATH, etc.
+  head      String?  // Department head name
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  school   School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  branch   Branch?  @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  teachers Teacher[]
+  classes  Class[]
+
+  @@unique([schoolId, code])
+  @@map("departments")
+}
+
+enum NotificationType {
+  ANNOUNCEMENT
+  REMINDER
+  ALERT
+  EVENT
+  HOLIDAY
+  EXAM_RESULT
+  ATTENDANCE_ALERT
+  FEE_DUE
+}
+
+enum NotificationChannel {
+  IN_APP
+  EMAIL
+  SMS
+  PUSH
+}
+
+enum DeliveryStatus {
+  PENDING
+  DELIVERED
+  FAILED
+  RETRY
+}
+
+enum EventType {
+  ACADEMIC
+  SPORTS
+  CULTURAL
+  MEETING
+  EXAM
+  HOLIDAY
+  OTHER
+}
+
+enum RecurrenceType {
+  NONE
+  DAILY
+  WEEKLY
+  MONTHLY
+  YEARLY
+}
+
+enum TargetType {
+  ALL_USERS
+  SPECIFIC_ROLES
+  SPECIFIC_USERS
+  BRANCH_WISE
+  CLASS_WISE
+  SECTION_WISE
+}
+
+model Notification {
+  id              String             @id @default(uuid())
+  schoolId        String
+  branchId        String?            // Null for school-wide
+  title           String
+  message         String
+  type            NotificationType
+  channels        NotificationChannel[]
+  targetType      TargetType
+  targetRoles     UserRole[]         @default([])
+  targetUserIds   String[]           @default([])
+  targetBranchIds String[]           @default([])
+  targetClassIds  String[]           @default([])
+  targetSectionIds String[]          @default([])
+  filters         Json?              // Additional filters
+  scheduledAt     DateTime?          // For scheduled notifications
+  expiresAt       DateTime?
+  isActive        Boolean            @default(true)
+  createdBy       String
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  school      School                 @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  branch      Branch?                @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  creator     User                   @relation("NotificationCreator", fields: [createdBy], references: [id])
+  deliveries  NotificationDelivery[]
+
+  @@map("notifications")
+}
+
+model NotificationDelivery {
+  id             String          @id @default(uuid())
+  notificationId String
+  userId         String
+  channel        NotificationChannel
+  status         DeliveryStatus  @default(PENDING)
+  deliveredAt    DateTime?
+  failureReason  String?
+  retryCount     Int             @default(0)
+  metadata       Json?           // Channel-specific data
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  notification Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([notificationId, userId, channel])
+  @@map("notification_deliveries")
+}
+
+model Event {
+  id            String         @id @default(uuid())
+  schoolId      String
+  branchId      String?        // Null for school-wide
+  title         String
+  description   String?
+  type          EventType
+  startDate     DateTime
+  endDate       DateTime
+  isAllDay      Boolean        @default(false)
+  location      String?
+  recurrenceType RecurrenceType @default(NONE)
+  recurrenceEnd  DateTime?
+  recurrenceData Json?          // Recurrence rules
+  isActive      Boolean        @default(true)
+  createdBy     String
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  school    School     @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  branch    Branch?    @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  creator   User       @relation("EventCreator", fields: [createdBy], references: [id])
+
+  @@map("events")
+}
+
+model Holiday {
+  id          String    @id @default(uuid())
+  schoolId    String
+  branchId    String?   // Null for school-wide
+  name        String
+  description String?
+  date        DateTime
+  isRecurring Boolean   @default(false)
+  recurrenceData Json?  // Yearly recurrence rules
+  affectsAttendance Boolean @default(true)
+  affectsTimetable  Boolean @default(true)
+  isActive    Boolean   @default(true)
+  createdBy   String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  school    School     @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  branch    Branch?    @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  creator   User       @relation("HolidayCreator", fields: [createdBy], references: [id])
+
+  @@map("holidays")
+}
+
+model NotificationPreference {
+  id        String                @id @default(uuid())
+  userId    String
+  channel   NotificationChannel
+  enabled   Boolean               @default(true)
+  dndStart  String?               // "22:00" format
+  dndEnd    String?               // "08:00" format
+  types     NotificationType[]    @default([])
+  createdAt DateTime              @default(now())
+  updatedAt DateTime              @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, channel])
+  @@map("notification_preferences")
+}
+
+model AuditLog {
+  id           String    @id @default(uuid())
+  schoolId     String
+  entityType   String    // "notification", "event", "holiday"
+  entityId     String
+  action       String    // "CREATE", "UPDATE", "DELETE"
+  oldValues    Json?
+  newValues    Json?
+  performedBy  String
+  performedAt  DateTime  @default(now())
+
+  school       School        @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  performer    User          @relation("AuditPerformer", fields: [performedBy], references: [id])
+
+  @@map("audit_logs")
+}
+
+model User {
+  id          String     @id @default(uuid())
+  schoolId    String?    // Null for platform admins
+  branchId    String?
+  email       String     @unique
+  phone       String?
+  password    String?    // Null until user sets it
+  firstName   String
+  lastName    String
+  role        UserRole
+  status      UserStatus @default(PENDING)
+  isMaster    Boolean    @default(false) // Only for MASTER_SUPER_ADMIN
+  createdBy   String?    // Who created this user
+  lastLogin   DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  school         School?         @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  branch         Branch?         @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  creator        User?           @relation("UserCreator", fields: [createdBy], references: [id])
+  createdUsers   User[]          @relation("UserCreator")
+  student        Student?
+  teacher        Teacher?
+  otps           Otp[]
+  tokens         UserToken[]
+  rolePermissions RolePermission[]
+  createdNotifications Notification[] @relation("NotificationCreator")
+  notificationDeliveries NotificationDelivery[]
+  notificationPreferences NotificationPreference[]
+  createdEvents  Event[]    @relation("EventCreator")
+  createdHolidays Holiday[] @relation("HolidayCreator")
+  auditLogs      AuditLog[] @relation("AuditPerformer")
 
   @@map("users")
+}
+
+model UserToken {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  type      String   // SETUP, REFRESH, ONBOARDING
+  expiresAt DateTime
+  isUsed    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_tokens")
+}
+
+model RolePermission {
+  id         String             @id @default(uuid())
+  userId     String
+  resource   PermissionResource
+  actions    PermissionAction[]
+  conditions Json?              // Additional conditions like "own_branch_only"
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, resource])
+  @@map("role_permissions")
+}
+
+model PermissionTemplate {
+  id          String             @id @default(uuid())
+  name        String             @unique
+  description String?
+  role        UserRole
+  resource    PermissionResource
+  actions     PermissionAction[]
+  conditions  Json?
+  isDefault   Boolean            @default(false)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  @@map("permission_templates")
+}
+
+model Otp {
+  id        String   @id @default(uuid())
+  userId    String
+  code      String
+  type      OtpType
+  expiresAt DateTime
+  isUsed    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("otps")
+}
+
+model Student {
+  id           String    @id @default(uuid())
+  schoolId     String
+  branchId     String
+  userId       String    @unique
+  rollNumber   String
+  admissionNo  String
+  dateOfBirth  DateTime?
+  gender       String?
+  address      String?
+  parentPhone  String?
+  parentEmail  String?
+  parentUserId String?   // Link to parent user account
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  school     School       @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  branch     Branch       @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  class      Class?       @relation(fields: [classId], references: [id])
+  classId    String?
+  section    Section?     @relation(fields: [sectionId], references: [id])
+  sectionId  String?
+  attendance Attendance[]
+  results    Result[]
+
+  @@unique([schoolId, rollNumber])
+  @@unique([schoolId, admissionNo])
+  @@map("students")
+}
+
+model Teacher {
+  id            String    @id @default(uuid())
+  schoolId      String
+  branchId      String
+  departmentId  String?   // Optional - for colleges
+  userId        String    @unique
+  employeeId    String
+  subject       String?
+  qualification String?
+  experience    Int?
+  salary        Decimal?
+  joinDate      DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  school     School      @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  branch     Branch      @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  department Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  classes    Class[]
+  sections   Section[]
+  exams      Exam[]
+
+  @@unique([schoolId, employeeId])
+  @@map("teachers")
+}
+
+model Class {
+  id           String      @id @default(uuid())
+  schoolId     String
+  branchId     String
+  departmentId String?     // Optional - for colleges
+  name         String
+  grade        Int
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  school     School      @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  branch     Branch      @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  department Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  teacher    Teacher?    @relation(fields: [teacherId], references: [id])
+  teacherId  String?
+  students   Student[]
+  sections   Section[]
+  exams      Exam[]
+
+  @@unique([schoolId, branchId, name])
+  @@map("classes")
+}
+
+model Section {
+  id        String   @id @default(uuid())
+  schoolId  String
+  branchId  String
+  classId   String
+  name      String
+  capacity  Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  branch     Branch       @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  class      Class        @relation(fields: [classId], references: [id], onDelete: Cascade)
+  teacher    Teacher?     @relation(fields: [teacherId], references: [id])
+  teacherId  String?
+  students   Student[]
+  attendance Attendance[]
+
+  @@unique([schoolId, branchId, classId, name])
+  @@map("sections")
+}
+
+model Attendance {
+  id        String   @id @default(uuid())
+  schoolId  String
+  branchId  String
+  studentId String
+  sectionId String
+  date      DateTime
+  status    String   // PRESENT, ABSENT, LATE
+  remarks   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  branch  Branch  @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  section Section @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+
+  @@unique([schoolId, studentId, date])
+  @@map("attendance")
+}
+
+model Exam {
+  id           String   @id @default(uuid())
+  schoolId     String
+  branchId     String
+  classId      String
+  name         String
+  type         String   // UNIT_TEST, MIDTERM, FINAL
+  subject      String
+  totalMarks   Int
+  passingMarks Int
+  examDate     DateTime
+  duration     Int      // in minutes
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  school    School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  branch    Branch   @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  class     Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
+  teacher   Teacher? @relation(fields: [teacherId], references: [id])
+  teacherId String?
+  results   Result[]
+
+  @@map("exams")
+}
+
+model Result {
+  id            String   @id @default(uuid())
+  schoolId      String
+  branchId      String
+  examId        String
+  studentId     String
+  marksObtained Int
+  grade         String?
+  remarks       String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  branch  Branch  @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  exam    Exam    @relation(fields: [examId], references: [id], onDelete: Cascade)
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([schoolId, examId, studentId])
+  @@map("results")
 }
