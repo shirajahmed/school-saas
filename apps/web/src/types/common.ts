@@ -29,9 +29,9 @@ export interface TableColumn {
 export interface FilterOption {
   key: string;
   label: string;
-  type: 'text' | 'select' | 'date' | 'dateRange';
+  type: "text" | "select" | "date" | "dateRange";
   options?: SelectOption[];
 }
 
-export type Theme = 'light' | 'dark' | 'system';
-export type Language = 'en' | 'es' | 'fr' | 'de' | 'hi' | 'ar';
+export type Theme = "light" | "dark" | "system";
+export type Language = "en" | "hi";

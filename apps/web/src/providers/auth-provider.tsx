@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { createContext, useContext, useEffect, useState } from 'react';
-import { AuthState, User, LoginCredentials } from '@/types/auth';
-import { STORAGE_KEYS } from '@/constants/config';
+import { createContext, useContext, useEffect, useState } from "react";
+import { AuthState, User, LoginCredentials } from "@/types/auth";
+import { STORAGE_KEYS } from "@/constants/config";
 
 interface AuthContextType extends AuthState {
   login: (credentials: LoginCredentials) => Promise<void>;
@@ -37,29 +37,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } catch {
         localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
         localStorage.removeItem(STORAGE_KEYS.USER_DATA);
-        setState(prev => ({ ...prev, isLoading: false }));
+        setState((prev) => ({ ...prev, isLoading: false }));
       }
     } else {
-      setState(prev => ({ ...prev, isLoading: false }));
+      setState((prev) => ({ ...prev, isLoading: false }));
     }
   }, []);
 
   const login = async (credentials: LoginCredentials) => {
-    setState(prev => ({ ...prev, isLoading: true }));
-    
+    setState((prev) => ({ ...prev, isLoading: true }));
+
     try {
       // Demo user for development - remove in production
       const demoUser = {
-        id: '1',
+        id: "1",
         email: credentials.email,
-        firstName: 'John',
-        lastName: 'Doe',
-        roles: ['SCHOOL_ADMIN' as any],
-        schoolId: 'school-1',
-        branchId: 'branch-1',
+        firstName: "John",
+        lastName: "Doe",
+        roles: ["SUPER_ADMIN" as any],
+        schoolId: "school-1",
+        branchId: "branch-1",
         isActive: true,
       };
-      const demoToken = 'demo-token-123';
+      const demoToken = "demo-token-123";
 
       localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, demoToken);
       localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(demoUser));
@@ -80,7 +80,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // if (!response.ok) throw new Error('Login failed');
       // const { user, token } = await response.json();
     } catch (error) {
-      setState(prev => ({ ...prev, isLoading: false }));
+      setState((prev) => ({ ...prev, isLoading: false }));
       throw error;
     }
   };
@@ -100,7 +100,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (state.user) {
       const updatedUser = { ...state.user, ...userData };
       localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(updatedUser));
-      setState(prev => ({ ...prev, user: updatedUser }));
+      setState((prev) => ({ ...prev, user: updatedUser }));
     }
   };
 
@@ -114,7 +114,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within AuthProvider');
+    throw new Error("useAuth must be used within AuthProvider");
   }
   return context;
 };

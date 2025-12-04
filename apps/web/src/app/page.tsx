@@ -25,16 +25,16 @@ export default function HomePage() {
   }
 
   if (isAuthenticated) {
-    return null; // Will redirect to dashboard
+    return null;
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-4 py-16">
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
             School Management
-            <span className="text-blue-600 dark:text-blue-400"> System</span>
+            <span className="text-primary"> System</span>
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
             A comprehensive, AI-powered platform for modern educational institutions. 
@@ -42,17 +42,20 @@ export default function HomePage() {
           </p>
         </div>
 
-        <div className="max-w-md mx-auto">
+        <div className="max-w-md mx-auto space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Welcome Back</CardTitle>
+              <CardTitle>Get Started</CardTitle>
               <CardDescription>
-                Sign in to access your school dashboard
+                Access your school dashboard or create a new account
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-3">
               <Button className="w-full" onClick={() => router.push('/auth/login')}>
                 Sign In
+              </Button>
+              <Button variant="outline" className="w-full" onClick={() => router.push('/auth/register')}>
+                Create School Account
               </Button>
             </CardContent>
           </Card>
